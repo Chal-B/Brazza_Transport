@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/*
+  Palette de reference — CLAUDE.md section 8.
+  Le PRD decrit les couleurs en mots, pas en hexa : les valeurs ci-dessous sont
+  des PLACEHOLDERS [A CONFIRMER] a caler sur le canvas Figma avant F3.
+  Contrainte non negociable : lisibilite en plein soleil, contraste AA minimum
+  sur fond ivoire. Chaque couleur de texte ci-dessous vise >= 4.5:1 sur --color-ivoire.
+*/
+@theme {
+  /* Fond ivoire clair */
+  --color-ivoire: #fdfbf5;
+
+  /* Primaire teal fonce */
+  --color-teal: #0f4c4c;
+  --color-teal-clair: #167070;
+
+  /* Alerte rouge — crise carburant */
+  --color-alerte: #b3261e;
+
+  /* Warning orange — heure de pointe */
+  --color-pointe: #b45309;
+
+  /* Succes vert — donnee fraiche */
+  --color-frais: #15803d;
+}
+
+body {
+  background-color: var(--color-ivoire);
+}
