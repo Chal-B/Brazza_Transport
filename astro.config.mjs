@@ -1,11 +1,11 @@
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
+import preact from '@astrojs/preact';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   output: 'static',
 
-  integrations: [react()],
+  integrations: [preact()],
 
   vite: {
     plugins: [tailwindcss()],
