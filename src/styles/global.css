@@ -1,76 +1,30 @@
 @import "tailwindcss";
-
-/* Manrope variable, auto-heberge. Le navigateur ne telecharge que le sous-ensemble
-   latin grace aux unicode-range : 24,8 Ko pour tout l'axe 200-800.
-   Auto-heberge plutot que Google Fonts : une connexion tierce de moins sur 3G. */
 @import "@fontsource-variable/manrope/wght.css";
 
-/* ============================================================================
-   DESIGN SYSTEM — extrait du CSS vanilla "ndako", adapte a Brazza Transport
-   ============================================================================
-
-   Ce qui est repris tel quel : la palette, la famille unique en graisses
-   variables, l'interlettrage negatif, les pilules, le jeu d'ombres, les rayons,
-   la courbe de mouvement, l'anneau de focus vert, le systeme de conteneur.
-
-   Ce qui est volontairement ECARTE, et pourquoi (CLAUDE.md section 2) :
-
-   1. Les images de fond (hero-house.jpg, testimonial-home-bg.jpg,
-      closing-home-bg.jpg). Regle de sobriete data : la persona principale est en
-      3G avec peu de data. Les fonds photo sont remplaces par des aplats.
-   2. La graisse 330 sur les grands titres. Du texte tres fin en plein soleil est
-      illisible ; le plancher ici est 430 sur les titres, 550 sur le texte courant.
-   3. Le texte a rgba(ink, 0.5) a 0.62), tres present dans le CSS source.
-      Mesure : 3,26:1 a 0,5 -> echec AA. Plancher fixe a 0,65 (5,55:1).
-   4. Le backdrop-filter generalise. Conserve uniquement sur la barre de recherche
-      et la nav : c'est couteux sur Android d'entree de gamme, et le flou baisse
-      le contraste percu en exterieur.
-   5. La taille de texte courant de 0,86rem (~13,8 px). Remontee a 1rem minimum :
-      cette appli se lit debout, dehors, sur un petit ecran.
-
-   REGLE DE CONTRASTE, non negociable :
-   le vert et l'orange sont des couleurs de REMPLISSAGE, jamais de texte.
-   Mesures WCAG sur fond --color-milk :
-     vert #7cff5b en texte .....  1,21:1  ECHEC
-     orange #ff7a2f en texte ...  2,44:1  ECHEC
-     ink SUR le vert ........... 14,32:1  AAA
-     ink SUR l'orange ..........  7,09:1  AAA
-     ink SUR le rouge ..........  5,77:1  AA
-   Autrement dit : pastille pleine + texte ink par-dessus. Jamais l'inverse.
-   ========================================================================== */
-
 @theme {
-  /* --- Neutres ---------------------------------------------------------- */
-  --color-ink: #111511;        /* quasi-noir chaud : fond de page, texte principal */
-  --color-deep: #050705;       /* noir profond : titres h2/h3 */
-  --color-milk: #f7f8f3;       /* blanc casse : fond des sections de contenu */
-  --color-smoke: #e9ece5;      /* gris clair chaud : survols discrets */
+  --color-ink: #111511;
+  --color-deep: #050705;
+  --color-milk: #f7f8f3;
+  --color-smoke: #e9ece5;
 
-  /* --- Marque ----------------------------------------------------------- */
-  --color-vert: #7cff5b;       /* vert lime. FOND UNIQUEMENT */
-  --color-vert-doux: #91ff72;  /* survol */
+  --color-vert: #7cff5b;
+  --color-vert-doux: #91ff72;
 
-  /* --- Semantique transport (PRD 7.3) — toutes en FOND, texte ink dessus -- */
-  --color-frais: #7cff5b;      /* verifie < 30 j */
-  --color-pointe: #ff7a2f;     /* heure de pointe */
-  --color-alerte: #ff5436;     /* crise carburant / signale incorrect */
+  --color-frais: #7cff5b;
+  --color-pointe: #ff7a2f;
+  --color-alerte: #ff5436;
 
-  /* --- Texte : un seul noir decline en opacite, plancher 0,65 ------------ */
   --color-texte: #111511;
-  --color-texte-2: rgb(17 21 17 / 0.8);   /* secondaire — 10,02:1 */
-  --color-texte-3: rgb(17 21 17 / 0.65);  /* plancher AA — 5,55:1 */
+  --color-texte-2: rgb(17 21 17 / 0.8);
+  --color-texte-3: rgb(17 21 17 / 0.65);
   --color-sur-ink: #ffffff;
   --color-sur-ink-2: rgb(255 255 255 / 0.76);
 
-  /* --- Verre ------------------------------------------------------------ */
   --color-verre: rgb(255 255 255 / 0.9);
   --color-verre-bord: rgb(255 255 255 / 0.72);
 
-  /* --- Typographie : une seule famille ---------------------------------- */
   --font-sans: "Manrope Variable", "Avenir Next", Inter, ui-sans-serif, system-ui, sans-serif;
 
-  /* Hierarchie par variation de graisse, jamais par changement de police.
-     L'axe Manrope s'arrete a 800 : le 900 du CSS source serait ecrete. */
   --font-weight-titre: 430;
   --font-weight-normal: 550;
   --font-weight-medium: 620;
@@ -78,13 +32,11 @@
   --font-weight-fort: 760;
   --font-weight-max: 800;
 
-  /* Interlettrage serre et systematiquement negatif. Signature du systeme. */
   --tracking-hero: -0.066em;
   --tracking-titre: -0.058em;
   --tracking-section: -0.076em;
   --tracking-serre: -0.035em;
 
-  /* --- Echelle typographique fluide ------------------------------------- */
   --text-hero: clamp(2.6rem, 6.2vw, 4.8rem);
   --text-section: clamp(2.1rem, 4.4vw, 3.8rem);
   --text-titre: clamp(1.35rem, 2vw, 1.75rem);
@@ -92,25 +44,20 @@
   --text-petit: 0.92rem;
   --text-micro: 0.82rem;
 
-  /* --- Rayons : tout est pilule ou carte arrondie ------------------------ */
   --radius-pilule: 999px;
   --radius-carte: 1.35rem;
   --radius-carte-sm: 0.95rem;
   --radius-panneau: 1.5rem;
 
-  /* --- Ombres ----------------------------------------------------------- */
   --shadow-carte: 0 20px 50px rgb(17 21 17 / 0.055);
   --shadow-carte-forte: 0 26px 70px rgb(17 21 17 / 0.08);
   --shadow-flottant: 0 12px 30px rgb(0 0 0 / 0.1);
   --shadow-verre: inset 0 1px 0 rgb(255 255 255 / 0.65), 0 12px 30px rgb(0 0 0 / 0.1);
   --shadow-vert: 0 14px 36px rgb(124 255 91 / 0.25);
 
-  /* --- Mouvement -------------------------------------------------------- */
   --ease-doux: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* Tokens de mise en page. Hors @theme : ils ne generent pas d'utilitaires,
-   ils servent au conteneur et aux marges laterales. */
 :root {
   --page-x: clamp(1.15rem, 5.3vw, 5.4rem);
   --container-max: 1180px;
@@ -129,8 +76,6 @@
     min-height: 100%;
   }
 
-  /* Le fond de page est sombre, comme dans le CSS source : ce sont les sections
-     de contenu qui portent le milk. Le hero se detache ainsi sans image. */
   body {
     margin: 0;
     background: var(--color-ink);
@@ -179,8 +124,6 @@
     line-height: 1.06;
   }
 
-  /* Anneau de focus vert, repris tel quel du CSS source : c'est le seul usage
-     ou le vert n'a pas besoin de ratio de contraste de texte. */
   :focus-visible {
     outline: 3px solid rgb(124 255 91 / 0.8);
     outline-offset: 3px;
@@ -198,19 +141,16 @@
 }
 
 @layer components {
-  /* Conteneur centre, largeur max 1180 px, gouttieres fluides. */
   .section-container {
     width: min(100% - (var(--page-x) * 2), var(--container-max));
     margin-inline: auto;
   }
 
-  /* Sections de contenu : fond clair sur page sombre. */
   .section-claire {
     background: var(--color-milk);
     color: var(--color-texte);
   }
 
-  /* --- Boutons ---------------------------------------------------------- */
   .cta {
     display: inline-flex;
     align-items: center;
@@ -265,7 +205,6 @@
     transform: translateY(-1px);
   }
 
-  /* --- Pilules de filtre (liste des lignes, F8) ------------------------- */
   .pilule {
     display: inline-flex;
     align-items: center;
@@ -302,9 +241,6 @@
     color: var(--color-sur-ink);
   }
 
-  /* --- Badge de fraicheur — barème du PRD section 7.3 -------------------
-     Ces classes existent pour rendre la regle de contraste impossible a
-     enfreindre par accident : le fond porte la couleur, le texte reste ink. */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -338,7 +274,6 @@
     background: var(--color-alerte);
   }
 
-  /* --- Cartes ----------------------------------------------------------- */
   .carte {
     border: 1px solid rgb(17 21 17 / 0.08);
     border-radius: var(--radius-carte);
@@ -348,7 +283,6 @@
     box-shadow: var(--shadow-carte);
   }
 
-  /* Cercle plein vert avec icone ink au centre — motif du CSS source. */
   .icone-cercle {
     display: grid;
     width: 3.05rem;
@@ -360,7 +294,6 @@
     box-shadow: var(--shadow-vert);
   }
 
-  /* --- Verre : reserve a la nav et a la barre de recherche --------------- */
   .verre {
     border: 1px solid var(--color-verre-bord);
     background: var(--color-verre);
@@ -368,7 +301,6 @@
     backdrop-filter: blur(18px);
   }
 
-  /* --- Accessibilite ---------------------------------------------------- */
   .sr-only {
     position: absolute;
     width: 1px;

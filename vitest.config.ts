@@ -1,11 +1,15 @@
-/// <reference types="vitest" />
-import { getViteConfig } from 'astro/config';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
-// getViteConfig reprend la resolution de modules d'Astro (alias @lib/*, import JSON),
-// ce qui permet de tester src/lib/ exactement comme il tourne dans l'app.
-export default getViteConfig({
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
+      '@data': fileURLToPath(new URL('./src/data', import.meta.url)),
+      '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
+    },
+  },
   test: {
-    // La logique metier de src/lib/ ne touche pas au DOM : environnement node.
     environment: 'node',
     include: ['tests/**/*.test.ts'],
     globals: false,
