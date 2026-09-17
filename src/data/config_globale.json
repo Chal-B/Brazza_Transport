@@ -1,0 +1,13 @@
+{
+  "isFuelCrisisActive": false,
+  "alertes_reseau": [
+    {
+      "id": "ALERT-01",
+      "actif": true,
+      "type": "penurie_carburant",
+      "message": "Alerte trafic : fortes tensions sur le carburant à Brazzaville. Anticipez la hausse des tarifs.",
+      "date_debut": null,
+      "date_fin": null
+    }
+  ]
+}

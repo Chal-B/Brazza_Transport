@@ -1,0 +1,10 @@
+{
+  "tarifs": [
+    {
+      "categorie": "Bus urbain",
+      "tarif_jour_fcfa": 150,
+      "note": "Tarif de base observé sur les 8 lignes enquêtées ; monte à 300 FCFA en heure de pointe sur les lignes avec tronçonnage constaté (voir fiche de chaque ligne)."
+    }
+  ],
+  "derniere_mise_a_jour": null
+}
