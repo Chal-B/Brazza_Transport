@@ -8,24 +8,55 @@
       "depart": "Centre-ville (La Gare)",
       "arrivee": "Moungali",
       "arrets_principaux": [
-        { "nom": "Gare Centrale", "repere": null },
-        { "nom": "Marché Poto-Poto", "repere": null },
-        { "nom": "Marché Moungali", "repere": null },
-        { "nom": "Rond-point Moungali", "repere": null }
+        {
+          "nom": "La Gare",
+          "repere": null
+        },
+        {
+          "nom": "Marché Poto-Poto",
+          "repere": null
+        },
+        {
+          "nom": "Marché Moungali",
+          "repere": null
+        },
+        {
+          "nom": "Rond-point Moungali",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "07:00", "fin": "09:00" }, { "debut": "16:30", "fin": "19:30" }],
+          "creneaux": [
+            {
+              "debut": "07:00",
+              "fin": "09:00"
+            },
+            {
+              "debut": "16:30",
+              "fin": "19:30"
+            }
+          ],
           "fcfa": 300,
           "note": "Tronçonnage constaté — bouchon Av. de France / Marché Poto-Poto"
         },
-        "crise_carburant": { "fcfa": 450 }
+        "crise_carburant": {
+          "fcfa": 450
+        }
       },
       "particularites": [
         "Bouchon récurrent : Avenue de France / Marché Poto-Poto aux heures de pointe"
       ],
-      "correspondances_possibles": ["L02", "L03", "L04", "L07", "L08"],
+      "correspondances_possibles": [
+        "L02",
+        "L03",
+        "L04",
+        "L07",
+        "L08"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -37,28 +68,69 @@
       "depart": "Centre-ville (La Gare)",
       "arrivee": "Bacongo (Marché Total)",
       "arrets_principaux": [
-        { "nom": "La Gare", "repere": null },
-        { "nom": "SNE", "repere": null },
-        { "nom": "Congo Pharmacie", "repere": null },
-        { "nom": "Ex Trésor", "repere": null },
-        { "nom": "Central", "repere": null },
-        { "nom": "CCF", "repere": null },
-        { "nom": "La Milice", "repere": null },
-        { "nom": "Marché Total", "repere": null }
+        {
+          "nom": "La Gare",
+          "repere": null
+        },
+        {
+          "nom": "SNE",
+          "repere": null
+        },
+        {
+          "nom": "Congo Pharmacie",
+          "repere": null
+        },
+        {
+          "nom": "Ex Trésor",
+          "repere": null
+        },
+        {
+          "nom": "Central",
+          "repere": null
+        },
+        {
+          "nom": "CCF",
+          "repere": null
+        },
+        {
+          "nom": "La Milice",
+          "repere": null
+        },
+        {
+          "nom": "Marché Total",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "06:30", "fin": "08:30" }, { "debut": "16:00", "fin": "19:00" }],
+          "creneaux": [
+            {
+              "debut": "06:30",
+              "fin": "08:30"
+            },
+            {
+              "debut": "16:00",
+              "fin": "19:00"
+            }
+          ],
           "fcfa": 150,
           "note": "Pas de tronçonnage constaté sur cette ligne — bouchon signalé (Rond-Point La Coupole / Marché Total) mais tarif stable"
         },
-        "crise_carburant": { "fcfa": 300 }
+        "crise_carburant": {
+          "fcfa": 300
+        }
       },
       "particularites": [
         "Bouchon récurrent : Rond-Point La Coupole et Marché Total aux heures de pointe"
       ],
-      "correspondances_possibles": ["L01", "L04", "L07"],
+      "correspondances_possibles": [
+        "L01",
+        "L04",
+        "L07"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -70,28 +142,67 @@
       "depart": "CHU",
       "arrivee": "Ouenzé (Texaco)",
       "arrets_principaux": [
-        { "nom": "CHU-B", "repere": null },
-        { "nom": "Ambassade", "repere": null },
-        { "nom": "Métro", "repere": null },
-        { "nom": "PSP", "repere": null },
-        { "nom": "Marché Moungali", "repere": null },
-        { "nom": "Koulounda", "repere": null },
-        { "nom": "Bouemba", "repere": null },
-        { "nom": "Texaco", "repere": null }
+        {
+          "nom": "CHU-B",
+          "repere": null
+        },
+        {
+          "nom": "Ambassade",
+          "repere": null
+        },
+        {
+          "nom": "Métro",
+          "repere": null
+        },
+        {
+          "nom": "PSP",
+          "repere": null
+        },
+        {
+          "nom": "Marché Moungali",
+          "repere": null
+        },
+        {
+          "nom": "Koulounda",
+          "repere": null
+        },
+        {
+          "nom": "Bouemba",
+          "repere": null
+        },
+        {
+          "nom": "Texaco",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "06:30", "fin": "09:00" }, { "debut": "16:00", "fin": "19:30" }],
+          "creneaux": [
+            {
+              "debut": "06:30",
+              "fin": "09:00"
+            },
+            {
+              "debut": "16:00",
+              "fin": "19:30"
+            }
+          ],
           "fcfa": 150,
           "note": "Pas de tronçonnage constaté — bouchon signalé (Intersection Mbochi / Av. de la Paix) mais tarif stable"
         },
-        "crise_carburant": { "fcfa": 300 }
+        "crise_carburant": {
+          "fcfa": 300
+        }
       },
       "particularites": [
         "Bouchon récurrent : Intersection Mbochi / Avenue de la Paix aux heures de pointe"
       ],
-      "correspondances_possibles": ["L01"],
+      "correspondances_possibles": [
+        "L01"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -103,30 +214,76 @@
       "depart": "Centre-ville (La Gare)",
       "arrivee": "Talangaï",
       "arrets_principaux": [
-        { "nom": "La Gare", "repere": null },
-        { "nom": "Station", "repere": null },
-        { "nom": "Port ATC", "repere": null },
-        { "nom": "Brasserie", "repere": null },
-        { "nom": "ONEMO", "repere": null },
-        { "nom": "Makiémba", "repere": null },
-        { "nom": "Blacher", "repere": null },
-        { "nom": "TP", "repere": null },
-        { "nom": "La Mairie", "repere": null },
-        { "nom": "Hôpital Talangaï", "repere": null }
+        {
+          "nom": "La Gare",
+          "repere": null
+        },
+        {
+          "nom": "Station",
+          "repere": null
+        },
+        {
+          "nom": "Port ATC",
+          "repere": null
+        },
+        {
+          "nom": "Brasserie",
+          "repere": null
+        },
+        {
+          "nom": "ONEMO",
+          "repere": null
+        },
+        {
+          "nom": "Makiémba",
+          "repere": null
+        },
+        {
+          "nom": "Blacher",
+          "repere": null
+        },
+        {
+          "nom": "TP",
+          "repere": null
+        },
+        {
+          "nom": "La Mairie",
+          "repere": null
+        },
+        {
+          "nom": "Hôpital Talangaï",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "06:00", "fin": "08:30" }, { "debut": "16:30", "fin": "19:30" }],
+          "creneaux": [
+            {
+              "debut": "06:00",
+              "fin": "08:30"
+            },
+            {
+              "debut": "16:30",
+              "fin": "19:30"
+            }
+          ],
           "fcfa": 150,
           "note": "Pas de tronçonnage constaté — bouchon signalé (Rond-point Ebina / Hôpital Talangaï) mais tarif stable"
         },
-        "crise_carburant": { "fcfa": 300 }
+        "crise_carburant": {
+          "fcfa": 300
+        }
       },
       "particularites": [
         "Bouchon récurrent : Rond-point Ebina et Hôpital Talangaï aux heures de pointe"
       ],
-      "correspondances_possibles": ["L01", "L02"],
+      "correspondances_possibles": [
+        "L01",
+        "L02"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -138,27 +295,63 @@
       "depart": "Marché Talangaï",
       "arrivee": "Soprogie",
       "arrets_principaux": [
-        { "nom": "Marché Talangaï", "repere": null },
-        { "nom": "Liberté", "repere": null },
-        { "nom": "Mikalou", "repere": null },
-        { "nom": "Lycée", "repere": null },
-        { "nom": "Kombo", "repere": null },
-        { "nom": "Massengo", "repere": null },
-        { "nom": "Soprogie", "repere": null }
+        {
+          "nom": "Marché Talangaï",
+          "repere": null
+        },
+        {
+          "nom": "Liberté",
+          "repere": null
+        },
+        {
+          "nom": "Mikalou",
+          "repere": null
+        },
+        {
+          "nom": "Lycée",
+          "repere": null
+        },
+        {
+          "nom": "Kombo",
+          "repere": null
+        },
+        {
+          "nom": "Massengo",
+          "repere": null
+        },
+        {
+          "nom": "Soprogie",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "07:00", "fin": "09:00" }, { "debut": "17:00", "fin": "19:30" }],
+          "creneaux": [
+            {
+              "debut": "07:00",
+              "fin": "09:00"
+            },
+            {
+              "debut": "17:00",
+              "fin": "19:30"
+            }
+          ],
           "fcfa": 300,
           "note": "Tronçonnage constaté — bouchon Lycée Thoma et Marché Massengo"
         },
-        "crise_carburant": { "fcfa": 450 }
+        "crise_carburant": {
+          "fcfa": 450
+        }
       },
       "particularites": [
         "Bouchon récurrent : Lycée Thoma et Marché Massengo aux heures de pointe"
       ],
-      "correspondances_possibles": ["L06"],
+      "correspondances_possibles": [
+        "L06"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -170,26 +363,60 @@
       "depart": "Kombo",
       "arrivee": "Mazala",
       "arrets_principaux": [
-        { "nom": "Kombo", "repere": null },
-        { "nom": "Sima la télé", "repere": null },
-        { "nom": "Mama Mapassa", "repere": null },
-        { "nom": "ACK", "repere": null },
-        { "nom": "Virage", "repere": null },
-        { "nom": "Rond-point Mazala", "repere": null }
+        {
+          "nom": "Kombo",
+          "repere": null
+        },
+        {
+          "nom": "Sima la télé",
+          "repere": null
+        },
+        {
+          "nom": "Mama Mapassa",
+          "repere": null
+        },
+        {
+          "nom": "ACK",
+          "repere": null
+        },
+        {
+          "nom": "Virage",
+          "repere": null
+        },
+        {
+          "nom": "Mazala",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "06:30", "fin": "08:30" }, { "debut": "16:00", "fin": "19:00" }],
+          "creneaux": [
+            {
+              "debut": "06:30",
+              "fin": "08:30"
+            },
+            {
+              "debut": "16:00",
+              "fin": "19:00"
+            }
+          ],
           "fcfa": 300,
           "note": "Tronçonnage constaté — bouchon Rond-point Mazala"
         },
-        "crise_carburant": { "fcfa": 300 }
+        "crise_carburant": {
+          "fcfa": 300
+        }
       },
       "particularites": [
         "Bouchon récurrent : Rond-point Mazala aux heures de pointe"
       ],
-      "correspondances_possibles": ["L05", "L08"],
+      "correspondances_possibles": [
+        "L05",
+        "L08"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -201,29 +428,73 @@
       "depart": "Marché Total",
       "arrivee": "Marché Ouenzé",
       "arrets_principaux": [
-        { "nom": "Marché Total", "repere": null },
-        { "nom": "CCF", "repere": null },
-        { "nom": "Parquet", "repere": null },
-        { "nom": "Nganga Edouard", "repere": null },
-        { "nom": "Boulevard A", "repere": null },
-        { "nom": "PSP Plateau", "repere": null },
-        { "nom": "Rond-point Moungali", "repere": null },
-        { "nom": "Jeanne Viale", "repere": null },
-        { "nom": "Mampassi", "repere": null }
+        {
+          "nom": "Marché Total",
+          "repere": null
+        },
+        {
+          "nom": "CCF",
+          "repere": null
+        },
+        {
+          "nom": "Parquet",
+          "repere": null
+        },
+        {
+          "nom": "Nganga Edouard",
+          "repere": null
+        },
+        {
+          "nom": "Boulevard A",
+          "repere": null
+        },
+        {
+          "nom": "PSP Plateau",
+          "repere": null
+        },
+        {
+          "nom": "Rond-point Moungali",
+          "repere": null
+        },
+        {
+          "nom": "Jeanne Viale",
+          "repere": null
+        },
+        {
+          "nom": "Mampassi",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "08:00", "fin": "11:00" }, { "debut": "16:00", "fin": "19:00" }],
+          "creneaux": [
+            {
+              "debut": "08:00",
+              "fin": "11:00"
+            },
+            {
+              "debut": "16:00",
+              "fin": "19:00"
+            }
+          ],
           "fcfa": 300,
           "note": "Tronçonnage constaté — bouchon Jeanne Viale / Mampassi"
         },
-        "crise_carburant": { "fcfa": 300 }
+        "crise_carburant": {
+          "fcfa": 300
+        }
       },
       "particularites": [
         "Bouchon récurrent : Jeanne Viale / Mampassi aux heures de pointe"
       ],
-      "correspondances_possibles": ["L01", "L02", "L08"],
+      "correspondances_possibles": [
+        "L01",
+        "L02",
+        "L08"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     },
@@ -235,26 +506,61 @@
       "depart": "Moungali",
       "arrivee": "Moukondo",
       "arrets_principaux": [
-        { "nom": "Rond-point Moungali", "repere": null },
-        { "nom": "Commune Moungali", "repere": null },
-        { "nom": "Matsoua", "repere": null },
-        { "nom": "La fleur", "repere": null },
-        { "nom": "Marché Moukondo", "repere": null },
-        { "nom": "Mazala", "repere": null }
+        {
+          "nom": "Rond-point Moungali",
+          "repere": null
+        },
+        {
+          "nom": "Commune Moungali",
+          "repere": null
+        },
+        {
+          "nom": "Matsoua",
+          "repere": null
+        },
+        {
+          "nom": "La fleur",
+          "repere": null
+        },
+        {
+          "nom": "Marché Moukondo",
+          "repere": null
+        },
+        {
+          "nom": "Mazala",
+          "repere": null
+        }
       ],
       "tarification": {
-        "normal": { "jour_fcfa": 150 },
+        "normal": {
+          "jour_fcfa": 150
+        },
         "heure_pointe": {
-          "creneaux": [{ "debut": "06:00", "fin": "08:30" }, { "debut": "16:00", "fin": "19:00" }],
+          "creneaux": [
+            {
+              "debut": "06:00",
+              "fin": "08:30"
+            },
+            {
+              "debut": "16:00",
+              "fin": "19:00"
+            }
+          ],
           "fcfa": 300,
           "note": "Tronçonnage constaté — bouchon Marché Moukondo / Mazala"
         },
-        "crise_carburant": { "fcfa": 300 }
+        "crise_carburant": {
+          "fcfa": 300
+        }
       },
       "particularites": [
         "Bouchon récurrent : Marché Moukondo / Mazala aux heures de pointe"
       ],
-      "correspondances_possibles": ["L01", "L06", "L07"],
+      "correspondances_possibles": [
+        "L01",
+        "L06",
+        "L07"
+      ],
       "derniere_verification": null,
       "statut_verification": "verifie"
     }
