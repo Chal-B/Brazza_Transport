@@ -201,7 +201,8 @@
         "Bouchon récurrent : Intersection Mbochi / Avenue de la Paix aux heures de pointe"
       ],
       "correspondances_possibles": [
-        "L01"
+        "L01",
+        "L07"
       ],
       "derniere_verification": null,
       "statut_verification": "verifie"
@@ -449,7 +450,7 @@
           "repere": null
         },
         {
-          "nom": "PSP Plateau",
+          "nom": "PSP",
           "repere": null
         },
         {
@@ -493,6 +494,7 @@
       "correspondances_possibles": [
         "L01",
         "L02",
+        "L03",
         "L08"
       ],
       "derniere_verification": null,
