@@ -13,6 +13,7 @@
   --color-frais: #7cff5b;
   --color-pointe: #ff7a2f;
   --color-alerte: #ff5436;
+  --color-gris-badge: #d8dbd4;
 
   --color-texte: #111511;
   --color-texte-2: rgb(17 21 17 / 0.8);
@@ -272,6 +273,10 @@
 
   .badge-alerte {
     background: var(--color-alerte);
+  }
+
+  .badge-gris {
+    background: var(--color-gris-badge);
   }
 
   .carte {
