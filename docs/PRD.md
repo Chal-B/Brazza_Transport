@@ -74,9 +74,10 @@ Le piège à éviter : vouloir cartographier « toutes les lignes de la ville »
 ### 3.1 Décision consolidée du périmètre — **mise à jour avec les données terrain**
 
 L'enquête terrain a livré **8 lignes bus déjà vérifiées** (L01 à L08, voir section 7),
-soit davantage que le périmètre initialement prévu pour le Jalon 1. Aucune donnée
-taxi collectif n'a encore été collectée — c'est un point à combler avant d'annoncer
-une couverture « corridor complet ».
+soit davantage que le périmètre initialement prévu pour le Jalon 1. Le taxi collectif
+est hors périmètre du produit de façon permanente (décision du 2026-09-17, voir
+amendement section 7.2) — la « couverture corridor complet » s'entend donc pour
+le bus uniquement.
 
 - **Jalon 1 : Sprint 1** (cette semaine, livrable vendredi 18h) — **proposition** :
   3 lignes noyau parmi les 8 vérifiées, choisies pour leur point de correspondance
@@ -120,7 +121,7 @@ Délivrer une application web responsive permettant la recherche d'itinéraires 
 ### 4.3 Souhaitable (Should Have)
 
 - Page « Tarifs de référence » (catégories générales, hors dynamique par ligne).
-- Page d'accueil / liste de toutes les lignes, filtrable par quartier et par mode de transport (bus vs taxi collectif).
+- Page d'accueil / liste de toutes les lignes, filtrable par quartier.
 
 ### 4.4 Exclu du Sprint / hors MVP (Won't Have)
 
@@ -161,7 +162,7 @@ Given que l'utilisateur arrive sur l'application,
 When la page est chargée,
 Then l'application affiche les cartes des lignes Must Have du Jalon 1
      (L01 Centre-ville ↔ Moungali, L03 CHU ↔ Ouenzé, L08 Moungali ↔ Moukondo)
-     avec leur nom, origine, destination et type de véhicule (bus / taxi collectif).
+     avec leur nom, origine, destination et type de véhicule (bus).
 ```
 
 **Scénario 2 : affichage de la fraîcheur de donnée**
@@ -275,21 +276,17 @@ Then un message de confirmation apparaît : « Merci ! Votre signalement a été
      « signalements reçus ».
 ```
 
-### US-06 : Filtre par mode de transport
+### US-06 : Filtre par mode de transport — RETIRÉE (2026-09-17)
 
-*En tant qu'usager préférant les bus pour leur rapidité, je veux filtrer la liste des lignes par mode de transport, afin de masquer les taxis collectifs quand je cherche uniquement un bus.*
+> ⚠️ **Cette user story n'a plus lieu d'être.** Le taxi collectif est hors
+> périmètre du produit, de façon permanente (voir amendement section 7.2).
+> Un filtre « Bus uniquement » n'a aucun sens quand le produit ne couvre que
+> le bus — il n'y aurait rien à filtrer. F8 (page d'accueil) n'implémente donc
+> **aucun filtre par mode de transport**.
+>
+> Conservé ci-dessous à titre d'historique uniquement.
 
-**Scénario 1 : application du filtre**
-```
-Given que l'utilisateur affiche la liste des lignes,
-When il clique sur le filtre « Bus uniquement »,
-Then les lignes n'opérant qu'en taxi collectif sont masquées et seules les
-     lignes bus s'affichent.
-```
-> ⚠️ Toutes les 8 lignes de l'enquête terrain actuelle sont des **bus**. Le
-> filtre « Taxi collectif » n'a aujourd'hui aucune donnée à afficher — ce n'est
-> pas un bug, juste un gap de collecte à signaler clairement dans l'UI plutôt
-> que de masquer silencieusement le filtre.
+*(Ancien contenu, non applicable) En tant qu'usager préférant les bus pour leur rapidité, je voulais filtrer la liste des lignes par mode de transport, afin de masquer les taxis collectifs quand je cherchais uniquement un bus.*
 
 ### US-07 : Détail des arrêts & repères visuels
 
@@ -316,11 +313,10 @@ Then un tableau affiche le tarif jour bus urbain (150 FCFA, base observée sur
      une phrase de cadrage juridique précisant que ce sont des références
      collectées sur le terrain, pas des prix officiels réglementés.
 ```
-> ⚠️ Aucune donnée taxi collectif n'étant disponible dans l'enquête terrain
-> actuelle, la ligne « Taxi collectif » de `tarifs_reference.json` (section 7.5)
-> doit être retirée ou explicitement marquée comme non vérifiée tant qu'une
-> collecte dédiée n'a pas eu lieu — ne pas la laisser dans le tableau avec des
-> chiffres inventés.
+> ⚠️ Le taxi collectif est hors périmètre du produit de façon permanente
+> (2026-09-17) — la ligne « Taxi collectif » ne doit pas figurer dans
+> `tarifs_reference.json` (section 7.5), ni maintenant ni après une éventuelle
+> collecte terrain.
 
 ---
 
@@ -330,8 +326,8 @@ Then un tableau affiche le tarif jour bus urbain (150 FCFA, base observée sur
 
 Source : `Résultats_Recherche_Terrain.xlsx`, feuille « Résultat de recherche », 8 lignes.
 
-Toutes les lignes enquêtées sont des **bus** (aucune donnée taxi collectif à ce
-stade). Le champ `crise_carburant` a été adapté : le terrain a relevé **un
+Toutes les lignes enquêtées sont des **bus** — seule catégorie du périmètre
+produit, voir amendement section 7.2. Le champ `crise_carburant` a été adapté : le terrain a relevé **un
 tarif de crise unique observé** (pas une fourchette min/max comme supposé dans
 la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
 
@@ -617,12 +613,19 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
 
 ### 7.2 Dictionnaire des champs de lignes.json — révisé
 
+> ⚠️ **Amendement du 2026-09-17** : le taxi collectif est retiré du périmètre du
+> produit, de façon permanente — pas seulement « pas encore de données ». Le
+> produit couvre uniquement le transport en bus. `type` et `mode` n'ont donc
+> plus qu'une seule valeur possible chacun. Ceci corrige le tableau ci-dessous
+> ainsi que les sections 7.5, 8.1, 8.3, US-01 et US-06 qui envisageaient encore
+> une catégorie taxi collectif future.
+
 | Champ | Type | Obligatoire | Description |
 |---|---|---|---|
 | `id` | string | oui | Identifiant unique de la ligne (ex : L01) |
 | `nom` | string | oui | Nom usuel de la ligne |
-| `type` | enum | oui | `bus` \| `taxi_collectif` — **actuellement toutes les lignes sont `bus`, aucune donnée `taxi_collectif` collectée** |
-| `mode` | enum | oui | `bus_standard` \| `taxi_collectif`, utilisé par le filtre US-06 |
+| `type` | enum | oui | `bus` — seule valeur du périmètre produit |
+| `mode` | enum | oui | `bus_standard` — seule valeur du périmètre produit, utilisé par le filtre US-06 |
 | `depart` / `arrivee` | string | oui | Quartiers/points de départ et arrivée |
 | `arrets_principaux` | array[objet] | oui | Liste ordonnée des arrêts `{nom, repere}`, du départ à l'arrivée. Le champ `repere` (optionnel) alimente US-07 |
 | `tarification.normal` | objet `{jour_fcfa}` | oui | Tarif de référence hors heure de pointe et hors crise. **Le terrain n'a pas collecté de tarif nuit distinct — champ `nuit_fcfa` retiré tant qu'il n'est pas confirmé, ne pas le dupliquer à partir du tarif jour.** |
@@ -678,11 +681,14 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
 }
 ```
 > La catégorie « Taxi collectif » (1000/1500 FCFA) de la V1.0 était une donnée
-> d'exemple non vérifiée sur le terrain — **retirée**. Elle pourra être
-> réintégrée dès qu'une collecte terrain dédiée aux taxis collectifs sera menée.
-> Ne pas laisser un tableau de « tarifs de référence » afficher un chiffre non
-> vérifié à l'utilisateur : ça va directement à l'encontre du problème que le
-> produit cherche à résoudre (surfacturation par manque de référence fiable).
+> d'exemple non vérifiée sur le terrain — **retirée**.
+>
+> Mise à jour 2026-09-17 : elle ne sera **pas** réintégrée, même après une
+> collecte terrain dédiée — le taxi collectif est définitivement hors périmètre
+> du produit (voir amendement section 7.2). Ne pas laisser un tableau de
+> « tarifs de référence » afficher un chiffre non vérifié à l'utilisateur : ça
+> va directement à l'encontre du problème que le produit cherche à résoudre
+> (surfacturation par manque de référence fiable).
 
 ---
 
@@ -715,7 +721,7 @@ Objectif : amener l'utilisateur à la recherche en moins de 5 secondes.
 
 ### 8.3 Fiche détaillée d'une ligne
 
-- Nom de la ligne + type et mode (bus standard / taxi collectif).
+- Nom de la ligne + type et mode (bus standard).
 - Trajet complet : liste ordonnée des arrêts principaux avec repères, affichage en timeline verticale (US-07).
 - Bloc tarification dynamique : tarif normal mis en évidence, plus le tarif heure de pointe et/ou crise **uniquement si la ligne en a un enregistré et différent du tarif normal** (voir US-03 scénario 2bis — ne pas afficher un badge « heure de pointe » alarmant sur une ligne où le tarif ne bouge pas).
 - Bloc « Particularités » : bouchons connus, affiché seulement si les données existent.
@@ -744,7 +750,7 @@ Objectif : amener l'utilisateur à la recherche en moins de 5 secondes.
 
 ### 8.6 Liste de toutes les lignes
 
-- Liste/tableau filtrable par quartier et par mode de transport (bus vs taxi collectif, US-06). **Le filtre taxi collectif doit afficher un état vide explicite plutôt que de disparaître (voir US-06).**
+- Liste/tableau filtrable par quartier. Pas de filtre par mode de transport : US-06 est retirée, le produit ne couvre que le bus.
 - Lien vers chaque fiche détaillée.
 - Utile pour l'exploration libre et pour le SEO/référencement local.
 
@@ -790,7 +796,6 @@ Objectif : amener l'utilisateur à la recherche en moins de 5 secondes.
 ## 12. Pistes V2 (post-MVP)
 
 - Extension du corridor à Mfilou, Madibou, Djiri (Ouenzé, Moungali et Talangaï sont **déjà couverts** par les 8 lignes terrain, voir section 7.1).
-- Première collecte terrain dédiée aux **taxis collectifs** (aucune donnée à ce jour).
 - Confirmation des dates de collecte manquantes (`derniere_verification`) pour les 8 lignes déjà enquêtées.
 - Carte visuelle simple des lignes (SVG statique, pas de GPS temps réel).
 - Notation/avis des usagers sur la fiabilité d'une ligne.

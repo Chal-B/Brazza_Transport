@@ -17,7 +17,7 @@ describe('getToutesLesLignes', () => {
     for (const ligne of getToutesLesLignes()) {
       expect(ligne.id).toBeTruthy();
       expect(ligne.nom).toBeTruthy();
-      expect(['bus', 'taxi_collectif']).toContain(ligne.type);
+      expect(ligne.type).toBe('bus');
       expect(ligne.tarification.normal.jour_fcfa).toBeGreaterThan(0);
       expect(Array.isArray(ligne.arrets_principaux)).toBe(true);
       expect(ligne.arrets_principaux.length).toBeGreaterThan(0);

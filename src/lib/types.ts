@@ -1,6 +1,6 @@
-export type TypeLigne = 'bus' | 'taxi_collectif';
+export type TypeLigne = 'bus';
 
-export type ModeTransport = 'bus_standard' | 'taxi_collectif';
+export type ModeTransport = 'bus_standard';
 
 export type StatutVerification = 'verifie' | 'a_verifier' | 'signale_incorrect';
 

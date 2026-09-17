@@ -29,10 +29,10 @@ function validerLigne(valeur: unknown, index: number): Ligne {
   if (typeof ligne.id !== 'string' || ligne.id.length === 0) {
     throw new DonneesInvalidesError(`ligne a l'index ${index} : "id" doit etre une chaine non vide`);
   }
-  if (ligne.type !== 'bus' && ligne.type !== 'taxi_collectif') {
+  if (ligne.type !== 'bus') {
     throw new DonneesInvalidesError(`ligne "${ligne.id}" : "type" invalide (${String(ligne.type)})`);
   }
-  if (ligne.mode !== 'bus_standard' && ligne.mode !== 'taxi_collectif') {
+  if (ligne.mode !== 'bus_standard') {
     throw new DonneesInvalidesError(`ligne "${ligne.id}" : "mode" invalide (${String(ligne.mode)})`);
   }
   if (!Array.isArray(ligne.arrets_principaux) || ligne.arrets_principaux.length === 0) {
