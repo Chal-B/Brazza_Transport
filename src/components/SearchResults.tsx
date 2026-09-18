@@ -11,7 +11,7 @@ interface Props {
 
 function journaliser(depart: string, arrivee: string, nbResultats: number) {
   try {
-    fetch('/log-recherche', {
+    fetch('/api/log-recherche', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ depart, arrivee, nb_resultats: nbResultats }),
