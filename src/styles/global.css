@@ -377,6 +377,7 @@
   }
 
   .colonne-app {
+    position: relative;
     display: flex;
     width: min(100%, 560px);
     flex: 1;
@@ -769,6 +770,10 @@
     font-weight: var(--font-weight-max);
   }
 
+  .fond-decoratif {
+    display: none;
+  }
+
   .titre-hero {
     margin: 0.35rem 0 0;
     font-size: clamp(2.1rem, 9vw, 2.9rem);
@@ -1146,6 +1151,35 @@
 
   .marque {
     display: none;
+  }
+
+  .fond-decoratif {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 0;
+    display: block;
+    width: 1280px;
+    height: 29rem;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .fond-decoratif path {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-opacity: 0.09;
+    stroke-width: 2;
+  }
+
+  .fond-decoratif circle {
+    fill: var(--color-vert);
+    fill-opacity: 0.55;
+  }
+
+  .colonne-app > *:not(.fond-decoratif) {
+    position: relative;
+    z-index: 1;
   }
 
   .titre-hero {
