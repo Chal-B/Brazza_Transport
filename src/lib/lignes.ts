@@ -107,8 +107,18 @@ export function getConfigGlobale(): ConfigGlobale {
   return configGlobaleJson as ConfigGlobale;
 }
 
+const TYPE_ALERTE_CARBURANT = 'penurie_carburant';
+
+export function filtrerAlertesAffichables(config: ConfigGlobale): AlerteReseau[] {
+  return config.alertes_reseau.filter((alerte) => {
+    if (!alerte.actif) return false;
+    if (alerte.type === TYPE_ALERTE_CARBURANT && !config.isFuelCrisisActive) return false;
+    return true;
+  });
+}
+
 export function getAlertesActives(): AlerteReseau[] {
-  return getConfigGlobale().alertes_reseau.filter((alerte) => alerte.actif);
+  return filtrerAlertesAffichables(getConfigGlobale());
 }
 
 export function getTarifsReference(): TarifsReferenceData {

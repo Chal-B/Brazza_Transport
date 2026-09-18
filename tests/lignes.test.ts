@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  filtrerAlertesAffichables,
   getAlertesActives,
   getConfigGlobale,
   getLigneParId,
   getTarifsReference,
   getToutesLesLignes,
 } from '../src/lib/lignes';
+import type { AlerteReseau } from '../src/lib/types';
 
 describe('getToutesLesLignes', () => {
   it("charge les lignes sans supposer un nombre fixe", () => {
@@ -83,5 +85,62 @@ describe('getTarifsReference', () => {
     const { tarifs } = getTarifsReference();
     const categories = tarifs.map((t) => t.categorie.toLowerCase());
     expect(categories.some((c) => c.includes('taxi'))).toBe(false);
+  });
+});
+
+describe('US-04 — le bandeau carburant suit isFuelCrisisActive', () => {
+  const alerteCarburant: AlerteReseau = {
+    id: 'ALERT-01',
+    actif: true,
+    type: 'penurie_carburant',
+    message: 'Tensions sur le carburant',
+    date_debut: null,
+    date_fin: null,
+  };
+  const alerteTravaux: AlerteReseau = {
+    id: 'ALERT-02',
+    actif: true,
+    type: 'travaux',
+    message: 'Avenue coupee',
+    date_debut: null,
+    date_fin: null,
+  };
+
+  it('masque l alerte carburant quand la crise n est pas active cote tarifs', () => {
+    const affichables = filtrerAlertesAffichables({
+      isFuelCrisisActive: false,
+      alertes_reseau: [alerteCarburant],
+    });
+
+    expect(affichables).toEqual([]);
+  });
+
+  it('affiche l alerte carburant quand la crise est active', () => {
+    const affichables = filtrerAlertesAffichables({
+      isFuelCrisisActive: true,
+      alertes_reseau: [alerteCarburant],
+    });
+
+    expect(affichables).toHaveLength(1);
+  });
+
+  it('laisse passer les autres types d alerte, crise ou pas', () => {
+    for (const crise of [true, false]) {
+      const affichables = filtrerAlertesAffichables({
+        isFuelCrisisActive: crise,
+        alertes_reseau: [alerteTravaux],
+      });
+
+      expect(affichables.map((a) => a.id)).toEqual(['ALERT-02']);
+    }
+  });
+
+  it('ignore toujours une alerte inactive', () => {
+    const affichables = filtrerAlertesAffichables({
+      isFuelCrisisActive: true,
+      alertes_reseau: [{ ...alerteCarburant, actif: false }],
+    });
+
+    expect(affichables).toEqual([]);
   });
 });
