@@ -29,7 +29,7 @@ describe('Bareme PRD 7.3', () => {
     const badge = calculerBadgeFraicheur(null, 'verifie', maintenant);
 
     expect(badge.etat).toBe('inconnu');
-    expect(badge.classe).toBe('badge-gris');
+    expect(badge.classe).toBe('badge-inconnu');
     expect(badge.libelle).toBe('Date de vérification à confirmer');
     expect(badge.dateFormatee).toBeNull();
   });
@@ -88,7 +88,7 @@ describe('Bornes du bareme', () => {
     const badge = calculerBadgeFraicheur('pas-une-date', 'verifie', maintenant);
 
     expect(badge.etat).toBe('inconnu');
-    expect(badge.classe).toBe('badge-gris');
+    expect(badge.classe).toBe('badge-inconnu');
   });
 
   it('une chaine vide est traitee comme une date manquante', () => {
@@ -111,15 +111,15 @@ describe('Application au jeu de donnees reel', () => {
     for (const ligne of lignes) {
       const badge = badgeFraicheurDeLigne(ligne, maintenant);
       expect(badge.libelle.length).toBeGreaterThan(0);
-      expect(['badge-frais', 'badge-pointe', 'badge-alerte', 'badge-gris']).toContain(badge.classe);
+      expect(['badge-frais', 'badge-pointe', 'badge-alerte', 'badge-inconnu']).toContain(badge.classe);
     }
   });
 
-  it('les dates terrain etant absentes aujourd hui, les badges sont gris (voir #9)', () => {
+  it('les dates terrain etant absentes aujourd hui, les badges sont hachures (voir #9)', () => {
     const lignesSansDate = getToutesLesLignes().filter((l) => l.derniere_verification === null);
 
     for (const ligne of lignesSansDate) {
-      expect(badgeFraicheurDeLigne(ligne, maintenant).classe).toBe('badge-gris');
+      expect(badgeFraicheurDeLigne(ligne, maintenant).classe).toBe('badge-inconnu');
     }
   });
 });

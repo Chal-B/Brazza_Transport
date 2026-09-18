@@ -286,6 +286,7 @@
     letter-spacing: var(--tracking-serre);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    border: 1px solid transparent;
   }
 
   .badge::before {
@@ -309,8 +310,18 @@
     background: var(--color-alerte);
   }
 
-  .badge-gris {
-    background: var(--color-gris-badge);
+  .badge-inconnu {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--color-milk) 0 5px,
+      var(--color-gris-badge) 5px 10px
+    );
+    border-style: dashed;
+    border-color: rgb(17 21 17 / 0.45);
+  }
+
+  .badge-inconnu::before {
+    background: rgb(17 21 17 / 0.6);
   }
 
   .badge-bloc {

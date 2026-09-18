@@ -2,7 +2,7 @@ import type { Ligne, StatutVerification } from './types';
 
 export type EtatFraicheur = 'incorrect' | 'inconnu' | 'frais_24h' | 'frais' | 'a_confirmer';
 
-export type ClasseBadge = 'badge-frais' | 'badge-pointe' | 'badge-alerte' | 'badge-gris';
+export type ClasseBadge = 'badge-frais' | 'badge-pointe' | 'badge-alerte' | 'badge-inconnu';
 
 export interface BadgeFraicheur {
   etat: EtatFraicheur;
@@ -52,7 +52,7 @@ export function calculerBadgeFraicheur(
   if (date === null) {
     return {
       etat: 'inconnu',
-      classe: 'badge-gris',
+      classe: 'badge-inconnu',
       libelle: 'Date de vérification à confirmer',
       dateFormatee: null,
     };
