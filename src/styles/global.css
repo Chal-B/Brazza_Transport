@@ -1262,6 +1262,81 @@
     white-space: nowrap;
   }
 
+  .filtres {
+    display: flex;
+    gap: 0.55rem;
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+    margin: 1rem -1.25rem 0;
+    padding-inline: 1.25rem;
+    scrollbar-width: none;
+  }
+
+  .filtres::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carte-lignes {
+    padding-block: 0.2rem;
+  }
+
+  .carte-ligne {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding-block: 0.95rem;
+    color: var(--color-ink);
+  }
+
+  .carte-ligne + .carte-ligne {
+    border-top: 1px solid var(--color-smoke);
+  }
+
+  .carte-ligne[hidden] {
+    display: none;
+  }
+
+  .infos-ligne {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .nom-ligne {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-petit);
+    font-weight: var(--font-weight-fort);
+  }
+
+  .trajet-ligne-texte {
+    margin: 0;
+    color: var(--color-texte-2);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .badge-petit {
+    padding: 0.28rem 0.6rem;
+    font-size: 0.68rem;
+  }
+
+  .lien-voir {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: 2.05rem;
+    border: 1px solid rgb(17 21 17 / 0.18);
+    border-radius: var(--radius-pilule);
+    padding-inline: 0.8rem;
+    color: var(--color-ink);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-fort);
+  }
+
   .sr-only {
     position: absolute;
     width: 1px;

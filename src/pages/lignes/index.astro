@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LineCard from '../../components/LineCard.astro';
+import LineFilter from '../../components/LineFilter.tsx';
+import { getToutesLesLignes } from '../../lib/lignes';
+import { quartiersDistincts } from '../../lib/quartiers';
+
+const lignes = getToutesLesLignes();
+const quartiers = quartiersDistincts(lignes);
+---
+
+<BaseLayout
+  titre="Toutes les lignes | Brazza Transport"
+  description={`Les ${lignes.length} lignes du corridor prioritaire de Brazzaville, filtrables par quartier.`}
+  navActif="lignes"
+>
+  <div class="entete-fiche">
+    <a href="/" class="retour" aria-label="Retour à l’accueil">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </a>
+    <h1 class="titre-fiche titre-resultats">Toutes les lignes</h1>
+  </div>
+
+  <LineFilter client:load quartiers={quartiers} />
+
+  <div class="carte carte-lignes mt-4">
+    {lignes.map((ligne) => <LineCard ligne={ligne} />)}
+  </div>
+</BaseLayout>

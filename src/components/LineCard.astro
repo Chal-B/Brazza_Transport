@@ -1,0 +1,34 @@
+---
+import { badgeFraicheurDeLigne } from '../lib/freshness-badge';
+import { quartiersDeLigne } from '../lib/quartiers';
+import { libelleMode } from '../lib/libelles';
+import type { Ligne } from '../lib/types';
+
+interface Props {
+  ligne: Ligne;
+}
+
+const { ligne } = Astro.props;
+const badge = badgeFraicheurDeLigne(ligne);
+const quartiers = quartiersDeLigne(ligne);
+const nbArrets = ligne.arrets_principaux.length;
+const tarifNormal = ligne.tarification.normal.jour_fcfa;
+---
+
+<a
+  href={`/lignes/${ligne.id}`}
+  class="carte-ligne"
+  data-quartiers={quartiers.join('|')}
+>
+  <div class="infos-ligne">
+    <p class="nom-ligne">
+      <span class="puce-ligne">{ligne.id}</span>
+      {ligne.nom}
+    </p>
+    <p class="trajet-ligne-texte">
+      {libelleMode(ligne.mode)} · {tarifNormal} FCFA · {nbArrets} arrêts
+    </p>
+    <span class={`badge badge-petit ${badge.classe}`}>{badge.libelle}</span>
+  </div>
+  <span class="lien-voir" aria-hidden="true">Voir</span>
+</a>
