@@ -8,3 +8,5 @@ dist/
 CLAUDE.md
 ARCHITECTURE.md
 .claude/
+points.txt
+.playwright-mcp/
