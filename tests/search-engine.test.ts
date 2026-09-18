@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { lignesDesservantArret, rechercherTrajets, suggererArrets } from '../src/lib/search-engine';
+import {
+  estArretConnu,
+  lignesDesservantArret,
+  normaliser,
+  rechercherTrajets,
+  suggererArrets,
+  tousLesArrets,
+} from '../src/lib/search-engine';
 import { getToutesLesLignes } from '../src/lib/lignes';
 
 const lignes = getToutesLesLignes();
@@ -146,5 +153,87 @@ describe('lignesDesservantArret', () => {
 
   it('renvoie une liste vide pour un arret inconnu', () => {
     expect(lignesDesservantArret('Arret inexistant', lignes)).toEqual([]);
+  });
+});
+
+describe('suggestions par prefixe (saisie assistee)', () => {
+  it('« ma » sort les arrets dont un mot commence par ma', () => {
+    const suggestions = suggererArrets('ma', lignes);
+
+    expect(suggestions).toContain('Marché Moungali');
+    expect(suggestions).toContain('Makiémba');
+    expect(suggestions).toContain('Mazala');
+    expect(suggestions).toContain('La Mairie');
+  });
+
+  it('un fragment au milieu d un mot ne suggere rien', () => {
+    expect(suggererArrets('oto', lignes)).toEqual([]);
+  });
+
+  it('un mot interieur compte comme un debut', () => {
+    const suggestions = suggererArrets('moun', lignes);
+
+    expect(suggestions).toContain('Rond-point Moungali');
+    expect(suggestions).toContain('Marché Moungali');
+  });
+
+  it('les arrets commencant vraiment par la requete passent devant', () => {
+    const suggestions = suggererArrets('ma', lignes);
+
+    expect(suggestions.indexOf('Marché Total')).toBeLessThan(suggestions.indexOf('La Mairie'));
+  });
+
+  it('ne suggere jamais un arret absent des donnees', () => {
+    const tousLesArrets = new Set(lignes.flatMap((l) => l.arrets_principaux.map((a) => a.nom)));
+
+    for (const suggestion of suggererArrets('', lignes)) {
+      expect(tousLesArrets.has(suggestion)).toBe(true);
+    }
+  });
+});
+
+describe('insensibilite aux accents', () => {
+  it('normaliser retire les accents et la casse', () => {
+    expect(normaliser('  Marché Talangaï ')).toBe('marche talangai');
+  });
+
+  it('la suggestion donne le meme resultat avec et sans accent', () => {
+    expect(suggererArrets('marche', lignes)).toEqual(suggererArrets('marché', lignes));
+  });
+
+  it('un trajet saisi sans accent aboutit comme avec accent', () => {
+    const sansAccent = rechercherTrajets('Marche Moungali', 'La Gare', lignes);
+    const avecAccent = rechercherTrajets('Marché Moungali', 'La Gare', lignes);
+
+    expect(sansAccent.statut).toBe('resultats');
+    expect(sansAccent.statut).toBe(avecAccent.statut);
+    expect(sansAccent.options.length).toBe(avecAccent.options.length);
+  });
+
+  it('lignesDesservantArret ignore aussi les accents', () => {
+    expect(lignesDesservantArret('marche moungali', lignes).map((l) => l.id)).toEqual(
+      lignesDesservantArret('Marché Moungali', lignes).map((l) => l.id),
+    );
+  });
+});
+
+describe('estArretConnu — la recherche n accepte que la base', () => {
+  const arrets = tousLesArrets(lignes);
+
+  it('reconnait un arret reel, accents ou pas', () => {
+    expect(estArretConnu('Marché Moungali', arrets)).toBe(true);
+    expect(estArretConnu('marche moungali', arrets)).toBe(true);
+    expect(estArretConnu('  MARCHE MOUNGALI  ', arrets)).toBe(true);
+  });
+
+  it('refuse une saisie libre qui ne correspond a aucun arret', () => {
+    expect(estArretConnu('Chez ma tante', arrets)).toBe(false);
+    expect(estArretConnu('Marché', arrets)).toBe(false);
+    expect(estArretConnu('', arrets)).toBe(false);
+    expect(estArretConnu('   ', arrets)).toBe(false);
+  });
+
+  it('tousLesArrets ne contient aucun doublon', () => {
+    expect(new Set(arrets).size).toBe(arrets.length);
   });
 });

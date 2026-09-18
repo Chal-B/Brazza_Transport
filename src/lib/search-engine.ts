@@ -20,8 +20,24 @@ export interface ResultatRecherche {
   nbResultatsPourLog: number;
 }
 
-function normaliser(valeur: string): string {
-  return valeur.trim().toLowerCase();
+export function normaliser(valeur: string): string {
+  return valeur
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+}
+
+function motsDe(valeur: string): string[] {
+  return normaliser(valeur)
+    .split(/[^a-z0-9]+/)
+    .filter((mot) => mot.length > 0);
+}
+
+function commencePar(nom: string, requeteNormalisee: string): boolean {
+  if (requeteNormalisee.length === 0) return true;
+  if (normaliser(nom).startsWith(requeteNormalisee)) return true;
+  return motsDe(nom).some((mot) => mot.startsWith(requeteNormalisee));
 }
 
 function tarifNormalParDefaut(ligne: Ligne): number {
@@ -46,17 +62,39 @@ export function lignesDesservantArret(arret: string, lignes: Ligne[]): Ligne[] {
   return lignes.filter((ligne) => dessertArret(ligne, arret));
 }
 
-export function suggererArrets(recherche: string, lignes: Ligne[]): string[] {
-  const q = normaliser(recherche);
+export function memeArret(a: string, b: string): boolean {
+  return normaliser(a) === normaliser(b);
+}
+
+export function tousLesArrets(lignes: Ligne[]): string[] {
   const trouves = new Set<string>();
   for (const ligne of lignes) {
     for (const arret of ligne.arrets_principaux) {
-      if (q.length === 0 || normaliser(arret.nom).includes(q)) {
-        trouves.add(arret.nom);
-      }
+      trouves.add(arret.nom);
     }
   }
   return [...trouves].sort((a, b) => a.localeCompare(b, 'fr'));
+}
+
+export function filtrerArrets(recherche: string, arrets: string[]): string[] {
+  const q = normaliser(recherche);
+  return arrets
+    .filter((arret) => commencePar(arret, q))
+    .sort((a, b) => {
+      const debutA = normaliser(a).startsWith(q);
+      const debutB = normaliser(b).startsWith(q);
+      if (debutA !== debutB) return debutA ? -1 : 1;
+      return a.localeCompare(b, 'fr');
+    });
+}
+
+export function suggererArrets(recherche: string, lignes: Ligne[]): string[] {
+  return filtrerArrets(recherche, tousLesArrets(lignes));
+}
+
+export function estArretConnu(valeur: string, arrets: string[]): boolean {
+  if (normaliser(valeur).length === 0) return false;
+  return arrets.some((arret) => memeArret(arret, valeur));
 }
 
 export function rechercherTrajets(
