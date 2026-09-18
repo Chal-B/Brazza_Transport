@@ -1,0 +1,15 @@
+---
+import { getAlertesActives } from '../lib/lignes';
+
+const alertes = getAlertesActives();
+---
+
+{
+  alertes.length > 0 && (
+    <div class="bandeau-alerte" role="status">
+      {alertes.map((alerte) => (
+        <p>{alerte.message}</p>
+      ))}
+    </div>
+  )
+}
