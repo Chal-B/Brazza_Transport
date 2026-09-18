@@ -20,6 +20,7 @@
     "preact": "^10.29.8"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.20.3",
     "tailwindcss": "^4.3.3",
