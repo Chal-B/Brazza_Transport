@@ -1224,6 +1224,44 @@
     margin-top: 0.9rem;
   }
 
+  .carte-tarifs {
+    padding-block: 0.2rem;
+  }
+
+  .ligne-tableau {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1rem;
+  }
+
+  .ligne-tableau + .ligne-tableau {
+    border-top: 1px solid var(--color-smoke);
+  }
+
+  .categorie {
+    font-size: var(--text-corps);
+    font-weight: var(--font-weight-fort);
+  }
+
+  .note-tarif {
+    max-width: 15.5rem;
+    margin-top: 0.35rem;
+    color: var(--color-texte-2);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .montant-tarif {
+    flex: 0 0 auto;
+    font-size: var(--text-titre);
+    font-weight: var(--font-weight-max);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
   .sr-only {
     position: absolute;
     width: 1px;

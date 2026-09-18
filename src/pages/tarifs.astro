@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getTarifsReference } from '../lib/lignes';
+import { calculerBadgeFraicheur } from '../lib/freshness-badge';
+
+const { tarifs, derniere_mise_a_jour: derniereMiseAJour } = getTarifsReference();
+const badge = calculerBadgeFraicheur(derniereMiseAJour, 'verifie');
+---
+
+<BaseLayout
+  titre="Tarifs de référence | Brazza Transport"
+  description="Tarifs de référence par catégorie de transport à Brazzaville, collectés sur le terrain."
+  navActif="tarifs"
+>
+  <div class="entete-fiche">
+    <a href="/" class="retour" aria-label="Retour à l’accueil">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </a>
+    <h1 class="titre-fiche titre-resultats">Tarifs de référence</h1>
+  </div>
+
+  <p class="sous-texte mt-4">
+    Ces tarifs sont des références collectées sur le terrain, pas des prix officiels
+    réglementés. Ils vous aident à négocier et à éviter la surfacturation.
+  </p>
+
+  <div class="carte carte-tarifs mt-6">
+    {
+      tarifs.map((tarif) => (
+        <div class="ligne-tableau">
+          <div>
+            <div class="categorie">{tarif.categorie}</div>
+            {tarif.note && <div class="note-tarif">{tarif.note}</div>}
+          </div>
+          <div class="montant-tarif">{tarif.tarif_jour_fcfa} FCFA</div>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="mt-5">
+    <span class={`badge ${badge.classe}`}>
+      {badge.dateFormatee ? `Mise à jour le ${badge.dateFormatee}` : 'Date de mise à jour à confirmer'}
+    </span>
+  </p>
+
+  <p class="pied-signaler mt-8">
+    <a href="/signalement">Un tarif vous semble faux ? Signalez-le</a>
+  </p>
+</BaseLayout>
