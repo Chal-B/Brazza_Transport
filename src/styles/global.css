@@ -126,8 +126,17 @@
   }
 
   :focus-visible {
-    outline: 3px solid rgb(124 255 91 / 0.8);
+    outline: 3px solid var(--color-vert);
     outline-offset: 3px;
+  }
+
+  .page-app :focus-visible {
+    outline-color: var(--color-ink);
+  }
+
+  ::selection {
+    background: var(--color-vert);
+    color: var(--color-ink);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -276,6 +285,7 @@
     font-weight: var(--font-weight-fort);
     letter-spacing: var(--tracking-serre);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 
   .badge::before {
@@ -303,10 +313,21 @@
     background: var(--color-gris-badge);
   }
 
+  .badge-bloc {
+    align-items: flex-start;
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.35;
+  }
+
+  .badge-bloc::before {
+    margin-top: 0.42em;
+  }
+
   .carte {
-    border: 1px solid rgb(17 21 17 / 0.08);
     border-radius: var(--radius-carte);
-    background: rgb(255 255 255 / 0.66);
+    background: #fff;
     padding: clamp(1.2rem, 2.2vw, 1.8rem);
     color: var(--color-texte);
     box-shadow: var(--shadow-carte);
@@ -352,7 +373,7 @@
   .entete-fiche {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.7rem;
     padding-top: 1.1rem;
   }
 
@@ -363,62 +384,91 @@
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgb(17 21 17 / 0.12);
+    border: 1px solid rgb(17 21 17 / 0.16);
     border-radius: var(--radius-pilule);
     background: #fff;
     color: var(--color-ink);
+    transition:
+      background var(--duree-rapide) ease,
+      border-color var(--duree-rapide) ease;
+  }
+
+  .retour:hover {
+    border-color: var(--color-ink);
+    background: var(--color-smoke);
+  }
+
+  .retour svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .puce-ligne {
+    display: inline-flex;
+    min-width: 2.6rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.55rem;
+    background: var(--color-ink);
+    color: var(--color-sur-ink);
+    padding: 0.28rem 0.5rem;
+    font-size: var(--text-petit);
     font-weight: var(--font-weight-max);
+    letter-spacing: var(--tracking-serre);
+  }
+
+  .mode-ligne {
+    color: var(--color-texte-2);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-fort);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .titre-fiche {
-    font-size: var(--text-titre);
+    margin: 0.85rem 0 0;
+    font-size: clamp(1.6rem, 6vw, 2.1rem);
     font-weight: var(--font-weight-semi);
     letter-spacing: var(--tracking-titre);
-    line-height: 1.1;
-    margin: 0;
+    line-height: 1.12;
+    text-wrap: balance;
+    overflow-wrap: break-word;
   }
 
   .titre-bloc {
     margin: 0;
-    font-size: var(--text-petit);
+    color: var(--color-texte-2);
+    font-size: var(--text-micro);
     font-weight: var(--font-weight-max);
-    letter-spacing: var(--tracking-serre);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .sous-texte {
     margin: 0;
-    color: var(--color-texte-3);
+    color: var(--color-texte-2);
     font-size: var(--text-corps);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
 
-  .pilule-mode {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2rem;
-    border-radius: var(--radius-pilule);
-    background: var(--color-ink);
-    color: var(--color-sur-ink);
-    padding-inline: 0.85rem;
-    font-size: var(--text-micro);
-    font-weight: var(--font-weight-fort);
-    white-space: nowrap;
-  }
-
   .timeline {
     position: relative;
-    padding-left: 1.45rem;
     margin: 0;
+    padding: 0 0 0 1.6rem;
     list-style: none;
   }
 
   .timeline::before {
     position: absolute;
-    top: 0.45rem;
-    bottom: 0.45rem;
-    left: 0.32rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: 0.25rem;
     width: 2px;
     background: var(--color-smoke);
     content: "";
@@ -426,7 +476,7 @@
 
   .arret {
     position: relative;
-    padding-bottom: 1.15rem;
+    padding-bottom: 0.95rem;
   }
 
   .arret:last-child {
@@ -435,54 +485,144 @@
 
   .arret::before {
     position: absolute;
-    top: 0.3rem;
-    left: -1.45rem;
-    width: 0.7rem;
-    height: 0.7rem;
-    border: 2px solid var(--color-ink);
+    top: 0.42rem;
+    left: -1.6rem;
+    width: 0.62rem;
+    height: 0.62rem;
+    border: 2px solid rgb(17 21 17 / 0.32);
     border-radius: var(--radius-pilule);
-    background: var(--color-vert);
+    background: var(--color-milk);
     content: "";
+  }
+
+  .arret-correspondance::before {
+    border-color: var(--color-ink);
+    background: var(--color-vert);
+  }
+
+  .arret-terminus::before {
+    top: 0.3rem;
+    left: -1.78rem;
+    width: 0.98rem;
+    height: 0.98rem;
+    border-color: var(--color-ink);
+    background: var(--color-ink);
   }
 
   .nom-arret {
     font-size: var(--text-corps);
     font-weight: var(--font-weight-fort);
+    line-height: 1.3;
+  }
+
+  .arret-terminus .nom-arret {
+    font-weight: var(--font-weight-max);
+  }
+
+  .role-arret {
+    margin-left: 0.5rem;
+    color: var(--color-texte-2);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-fort);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .repere-arret {
     margin-top: 0.15rem;
-    color: var(--color-texte-3);
-    font-size: var(--text-micro);
+    color: var(--color-texte-2);
+    font-size: var(--text-petit);
     font-weight: var(--font-weight-medium);
   }
 
   .correspondance-arret {
-    display: inline-block;
-    margin-top: 0.3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.35rem;
     border-radius: var(--radius-pilule);
     background: var(--color-ink);
     color: var(--color-vert-doux);
-    padding: 0.15rem 0.55rem;
+    padding: 0.18rem 0.6rem;
     font-size: var(--text-micro);
     font-weight: var(--font-weight-fort);
+  }
+
+  .correspondance-arret svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tarif-actuel {
+    min-height: 6.7rem;
+  }
+
+  .tarif-actuel-corps {
+    animation: monter-doux var(--duree-moyenne) var(--ease-doux) both;
+  }
+
+  @keyframes monter-doux {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .montant-actuel {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: clamp(2rem, 8vw, 2.6rem);
+    font-weight: var(--font-weight-max);
+    letter-spacing: var(--tracking-serre);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .contexte-actuel {
+    margin-top: 0.7rem;
+  }
+
+  .attente-tarif {
+    width: 8.5rem;
+    height: 2.7rem;
+    margin-top: 0.7rem;
+    border-radius: var(--radius-carte-sm);
+    background: var(--color-smoke);
+    animation: pulsation-attente 1.4s var(--ease-doux) infinite;
+  }
+
+  @keyframes pulsation-attente {
+    50% {
+      opacity: 0.45;
+    }
+  }
+
+  .separateur-tarifs {
+    margin: 1.1rem 0 0.2rem;
+    border: 0;
+    border-top: 1px solid var(--color-smoke);
   }
 
   .bloc-tarif {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: 0.9rem;
+    padding-block: 0.65rem;
+  }
+
+  .bloc-tarif + .bloc-tarif {
     border-top: 1px solid var(--color-smoke);
-    padding-block: 0.7rem;
   }
 
-  .carte > .bloc-tarif:first-child {
-    border-top: 0;
-    padding-top: 0;
-  }
-
-  .carte > .bloc-tarif:last-child {
+  .bloc-tarif:last-child {
     padding-bottom: 0;
   }
 
@@ -492,17 +632,36 @@
   }
 
   .tarif-note {
-    margin-top: 0.15rem;
-    color: var(--color-texte-3);
+    margin-top: 0.2rem;
+    color: var(--color-texte-2);
     font-size: var(--text-micro);
     font-weight: var(--font-weight-medium);
     line-height: 1.4;
   }
 
-  .tarif-actuel {
-    margin-top: 0.3rem;
-    font-size: var(--text-micro);
-    font-weight: var(--font-weight-fort);
+  .montant-reference {
+    flex: 0 0 auto;
+    font-size: var(--text-corps);
+    font-weight: var(--font-weight-max);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .particularite {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .particularite svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex: 0 0 auto;
+    margin-top: 0.15rem;
+    fill: none;
+    stroke: var(--color-pointe);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .sr-only {

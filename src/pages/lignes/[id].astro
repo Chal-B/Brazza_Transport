@@ -22,9 +22,11 @@ const config = getConfigGlobale();
 const toutesLesLignes = getToutesLesLignes();
 const badge = badgeFraicheurDeLigne(ligne);
 
-const arrets = ligne.arrets_principaux.map((arret) => ({
+const dernierIndex = ligne.arrets_principaux.length - 1;
+const arrets = ligne.arrets_principaux.map((arret, index) => ({
   nom: arret.nom,
   repere: arret.repere,
+  role: index === 0 ? 'Départ' : index === dernierIndex ? 'Terminus' : null,
   correspondances: lignesDesservantArret(arret.nom, toutesLesLignes)
     .filter((autre) => autre.id !== ligne.id)
     .map((autre) => autre.id),
@@ -47,32 +49,54 @@ const lienSignalement = `/signalement?ligne=${encodeURIComponent(ligne.id)}`;
   titre={`${ligne.id} — ${ligne.nom} | Brazza Transport`}
   description={`Arrêts, tarifs et fraîcheur des données de la ligne ${ligne.id} : ${ligne.depart} vers ${ligne.arrivee}.`}
 >
+  <noscript slot="head">
+    <style>
+      .zone-tarif-actuel {
+        display: none;
+      }
+    </style>
+  </noscript>
+
   <main class="ecran-app">
     <div class="colonne-app">
-      <div class="entete-fiche">
-        <a href="/lignes" class="retour" aria-label="Retour à la liste des lignes">&larr;</a>
-        <div>
-          <p class="titre-bloc">Ligne {ligne.id}</p>
-          <h1 class="titre-fiche">{ligne.nom}</h1>
+      <header>
+        <div class="entete-fiche">
+          <a href="/lignes" class="retour" aria-label="Retour à la liste des lignes">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+          </a>
+          <span class="puce-ligne">{ligne.id}</span>
+          <span class="mode-ligne">Bus standard</span>
         </div>
-      </div>
+        <h1 class="titre-fiche">{ligne.nom}</h1>
+        <p class="mt-4">
+          <span class={`badge badge-bloc ${badge.classe}`}>{badge.libelle}</span>
+        </p>
+      </header>
 
-      <div class="mt-3 flex flex-wrap items-center gap-2">
-        <span class="pilule-mode">Bus standard</span>
-        <span class={`badge ${badge.classe}`}>{badge.libelle}</span>
-      </div>
-
-      <section class="mt-7">
+      <section class="mt-9">
         <h2 class="titre-bloc">Trajet complet</h2>
-        <ol class="timeline mt-3">
+        <ol class="timeline mt-4">
           {
             arrets.map((arret) => (
-              <li class="arret">
-                <div class="nom-arret">{arret.nom}</div>
+              <li
+                class:list={[
+                  'arret',
+                  arret.role !== null && 'arret-terminus',
+                  arret.role === null && arret.correspondances.length > 0 && 'arret-correspondance',
+                ]}
+              >
+                <div class="nom-arret">
+                  {arret.nom}
+                  {arret.role && <span class="role-arret">{arret.role}</span>}
+                </div>
                 {arret.repere && <div class="repere-arret">{arret.repere}</div>}
                 {arret.correspondances.length > 0 && (
                   <span class="correspondance-arret">
-                    ↔ {arret.correspondances.join(' · ')}
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 9h16l-4-4"></path>
+                      <path d="M20 15H4l4 4"></path>
+                    </svg>
+                    {arret.correspondances.join(' · ')}
                   </span>
                 )}
               </li>
@@ -81,12 +105,17 @@ const lienSignalement = `/signalement?ligne=${encodeURIComponent(ligne.id)}`;
         </ol>
       </section>
 
-      <section class="mt-7">
+      <section class="mt-9">
         <h2 class="titre-bloc">Tarifs</h2>
-        <div class="carte mt-3">
+        <div class="carte mt-4">
+          <div class="zone-tarif-actuel">
+            <FareBadge client:load ligne={ligne} config={config} />
+            <hr class="separateur-tarifs" />
+          </div>
+
           <div class="bloc-tarif">
             <div class="tarif-label">Tarif normal</div>
-            <span class="badge badge-frais">{tarifNormal} FCFA</span>
+            <span class="montant-reference">{tarifNormal} FCFA</span>
           </div>
 
           {
@@ -97,7 +126,7 @@ const lienSignalement = `/signalement?ligne=${encodeURIComponent(ligne.id)}`;
                   {creneaux && <div class="tarif-note">{creneaux}</div>}
                   {heurePointe.note && <div class="tarif-note">{heurePointe.note}</div>}
                 </div>
-                <span class="badge badge-pointe">{heurePointe.fcfa} FCFA</span>
+                <span class="montant-reference">{heurePointe.fcfa} FCFA</span>
               </div>
             )
           }
@@ -107,31 +136,36 @@ const lienSignalement = `/signalement?ligne=${encodeURIComponent(ligne.id)}`;
               <div class="bloc-tarif">
                 <div>
                   <div class="tarif-label">Crise carburant</div>
-                  <div class="tarif-note">Appliqué quand l'alerte carburant est active</div>
+                  <div class="tarif-note">Quand l'alerte carburant est active</div>
                 </div>
-                <span class="badge badge-alerte">{criseCarburant.fcfa} FCFA</span>
+                <span class="montant-reference">{criseCarburant.fcfa} FCFA</span>
               </div>
             )
           }
-
-          <FareBadge client:load ligne={ligne} config={config} />
         </div>
       </section>
 
       {
         particularites.length > 0 && (
-          <section class="mt-7">
-            <h2 class="titre-bloc">Particularités</h2>
-            <ul class="mt-3 grid gap-2 pl-5">
+          <section class="mt-9">
+            <h2 class="titre-bloc">À savoir</h2>
+            <ul class="mt-4 grid list-none gap-3 p-0">
               {particularites.map((particularite) => (
-                <li class="sous-texte">{particularite}</li>
+                <li class="particularite">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 4.5 2.9 20h18.2L12 4.5Z"></path>
+                    <path d="M12 10.3v3.8"></path>
+                    <path d="M12 17.1h.01"></path>
+                  </svg>
+                  <span class="sous-texte">{particularite}</span>
+                </li>
               ))}
             </ul>
           </section>
         )
       }
 
-      <div class="mt-9 mb-8 grid">
+      <div class="mt-10 mb-9 grid">
         <a href={lienSignalement} class="cta">Signaler une erreur sur cette ligne</a>
       </div>
     </div>
