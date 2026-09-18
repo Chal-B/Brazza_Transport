@@ -8,6 +8,7 @@ import {
   getToutesLesLignes,
 } from '../src/lib/lignes';
 import type { AlerteReseau } from '../src/lib/types';
+import { libelleMode, libelleType } from '../src/lib/libelles';
 
 describe('getToutesLesLignes', () => {
   it("charge les lignes sans supposer un nombre fixe", () => {
@@ -142,5 +143,14 @@ describe('US-04 — le bandeau carburant suit isFuelCrisisActive', () => {
     });
 
     expect(affichables).toEqual([]);
+  });
+});
+
+describe('libelles de mode et de type', () => {
+  it('chaque ligne du JSON a un libelle de mode et de type', () => {
+    for (const ligne of getToutesLesLignes()) {
+      expect(libelleMode(ligne.mode).length).toBeGreaterThan(0);
+      expect(libelleType(ligne.type).length).toBeGreaterThan(0);
+    }
   });
 });
