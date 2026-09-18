@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchResults from '../components/SearchResults.tsx';
+import SearchBar from '../components/SearchBar.tsx';
+import { getConfigGlobale, getToutesLesLignes } from '../lib/lignes';
+import { tousLesArrets } from '../lib/search-engine';
+
+const lignes = getToutesLesLignes();
+const config = getConfigGlobale();
+const arrets = tousLesArrets(lignes);
+---
+
+<BaseLayout
+  titre="Résultats de recherche | Brazza Transport"
+  description="Trajets possibles entre deux arrêts du corridor prioritaire de Brazzaville, avec le tarif applicable."
+  navActif="chercher"
+>
+  <div class="entete-fiche">
+    <a href="/" class="retour" aria-label="Retour à l’accueil">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </a>
+    <h1 class="titre-fiche titre-resultats">Résultats</h1>
+  </div>
+
+  <section class="mt-6">
+    <SearchResults client:load lignes={lignes} config={config} />
+  </section>
+
+  <section class="mt-10">
+    <h2 class="titre-bloc">Modifier la recherche</h2>
+    <div class="mt-4">
+      <SearchBar client:visible arrets={arrets} />
+    </div>
+  </section>
+</BaseLayout>

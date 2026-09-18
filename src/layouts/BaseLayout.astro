@@ -1,13 +1,16 @@
 ---
 import '../styles/global.css';
 import AlertBanner from '../components/AlertBanner.astro';
+import NavBar from '../components/NavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
 interface Props {
   titre: string;
   description?: string;
+  navActif?: 'accueil' | 'chercher' | 'lignes' | 'tarifs' | 'signaler';
 }
 
-const { titre, description } = Astro.props;
+const { titre, description, navActif } = Astro.props;
 ---
 
 <!doctype html>
@@ -21,7 +24,14 @@ const { titre, description } = Astro.props;
     <slot name="head" />
   </head>
   <body class="page-app">
+    <a href="#contenu" class="lien-evitement">Aller au contenu</a>
+    <NavBar actif={navActif} />
     <AlertBanner />
-    <slot />
+    <main id="contenu" class="ecran-app">
+      <div class="colonne-app">
+        <slot />
+        <SiteFooter />
+      </div>
+    </main>
   </body>
 </html>

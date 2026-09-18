@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchBar from '../components/SearchBar.tsx';
+import { getToutesLesLignes } from '../lib/lignes';
+import { tousLesArrets } from '../lib/search-engine';
+
+const lignes = getToutesLesLignes();
+const arrets = tousLesArrets(lignes);
+const nbLignes = lignes.length;
+const toutesVerifiees = lignes.every((ligne) => ligne.statut_verification === 'verifie');
+const compteur = toutesVerifiees
+  ? `${nbLignes} lignes documentées et vérifiées sur le corridor prioritaire`
+  : `${nbLignes} lignes documentées sur le corridor prioritaire`;
+---
+
+<BaseLayout
+  titre="Brazza Transport — Où voulez-vous aller ?"
+  description={`Itinéraires et tarifs des transports en commun de Brazzaville sur ${nbLignes} lignes relevées sur le terrain.`}
+  navActif="accueil"
+>
+  <p class="marque">Brazza<span>Transport</span></p>
+
+  <h1 class="titre-hero">Où voulez-vous aller&nbsp;?</h1>
+
+  <SearchBar client:load arrets={arrets} />
+
+  <div class="liens-rapides">
+    <a href="/lignes" class="bouton-contour">Toutes les lignes</a>
+    <a href="/tarifs" class="bouton-contour">Tarifs de référence</a>
+  </div>
+
+  <p class="compteur-lignes">{compteur}</p>
+
+  <p class="pied-signaler">
+    <a href="/signalement">Vous connaissez une ligne ? Signalez-la</a>
+  </p>
+</BaseLayout>
