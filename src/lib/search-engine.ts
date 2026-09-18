@@ -42,6 +42,10 @@ function arretCommun(a: Ligne, b: Ligne): string | null {
   return null;
 }
 
+export function lignesDesservantArret(arret: string, lignes: Ligne[]): Ligne[] {
+  return lignes.filter((ligne) => dessertArret(ligne, arret));
+}
+
 export function suggererArrets(recherche: string, lignes: Ligne[]): string[] {
   const q = normaliser(recherche);
   const trouves = new Set<string>();

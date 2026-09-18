@@ -1,0 +1,25 @@
+---
+import '../styles/global.css';
+import AlertBanner from '../components/AlertBanner.astro';
+
+interface Props {
+  titre: string;
+  description?: string;
+}
+
+const { titre, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titre}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body class="page-app">
+    <AlertBanner />
+    <slot />
+  </body>
+</html>

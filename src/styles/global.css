@@ -275,6 +275,7 @@
     font-size: var(--text-micro);
     font-weight: var(--font-weight-fort);
     letter-spacing: var(--tracking-serre);
+    white-space: nowrap;
   }
 
   .badge::before {
@@ -327,6 +328,181 @@
     background: var(--color-verre);
     box-shadow: var(--shadow-verre);
     backdrop-filter: blur(18px);
+  }
+
+  .page-app {
+    background: var(--color-milk);
+    color: var(--color-texte);
+  }
+
+  .ecran-app {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+    background: var(--color-milk);
+    color: var(--color-texte);
+  }
+
+  .colonne-app {
+    width: min(100%, 560px);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  .entete-fiche {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding-top: 1.1rem;
+  }
+
+  .retour {
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(17 21 17 / 0.12);
+    border-radius: var(--radius-pilule);
+    background: #fff;
+    color: var(--color-ink);
+    font-weight: var(--font-weight-max);
+  }
+
+  .titre-fiche {
+    font-size: var(--text-titre);
+    font-weight: var(--font-weight-semi);
+    letter-spacing: var(--tracking-titre);
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .titre-bloc {
+    margin: 0;
+    font-size: var(--text-petit);
+    font-weight: var(--font-weight-max);
+    letter-spacing: var(--tracking-serre);
+    text-transform: uppercase;
+  }
+
+  .sous-texte {
+    margin: 0;
+    color: var(--color-texte-3);
+    font-size: var(--text-corps);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+
+  .pilule-mode {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    border-radius: var(--radius-pilule);
+    background: var(--color-ink);
+    color: var(--color-sur-ink);
+    padding-inline: 0.85rem;
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-fort);
+    white-space: nowrap;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 1.45rem;
+    margin: 0;
+    list-style: none;
+  }
+
+  .timeline::before {
+    position: absolute;
+    top: 0.45rem;
+    bottom: 0.45rem;
+    left: 0.32rem;
+    width: 2px;
+    background: var(--color-smoke);
+    content: "";
+  }
+
+  .arret {
+    position: relative;
+    padding-bottom: 1.15rem;
+  }
+
+  .arret:last-child {
+    padding-bottom: 0;
+  }
+
+  .arret::before {
+    position: absolute;
+    top: 0.3rem;
+    left: -1.45rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-pilule);
+    background: var(--color-vert);
+    content: "";
+  }
+
+  .nom-arret {
+    font-size: var(--text-corps);
+    font-weight: var(--font-weight-fort);
+  }
+
+  .repere-arret {
+    margin-top: 0.15rem;
+    color: var(--color-texte-3);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .correspondance-arret {
+    display: inline-block;
+    margin-top: 0.3rem;
+    border-radius: var(--radius-pilule);
+    background: var(--color-ink);
+    color: var(--color-vert-doux);
+    padding: 0.15rem 0.55rem;
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-fort);
+  }
+
+  .bloc-tarif {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    border-top: 1px solid var(--color-smoke);
+    padding-block: 0.7rem;
+  }
+
+  .carte > .bloc-tarif:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .carte > .bloc-tarif:last-child {
+    padding-bottom: 0;
+  }
+
+  .tarif-label {
+    font-size: var(--text-petit);
+    font-weight: var(--font-weight-fort);
+  }
+
+  .tarif-note {
+    margin-top: 0.15rem;
+    color: var(--color-texte-3);
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.4;
+  }
+
+  .tarif-actuel {
+    margin-top: 0.3rem;
+    font-size: var(--text-micro);
+    font-weight: var(--font-weight-fort);
   }
 
   .sr-only {

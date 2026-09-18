@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rechercherTrajets, suggererArrets } from '../src/lib/search-engine';
+import { lignesDesservantArret, rechercherTrajets, suggererArrets } from '../src/lib/search-engine';
 import { getToutesLesLignes } from '../src/lib/lignes';
 
 const lignes = getToutesLesLignes();
@@ -127,5 +127,24 @@ describe('tarif injectable (prepare F4)', () => {
   it('accepte un calculateur de tarif personnalise', () => {
     const resultat = rechercherTrajets('CHU-B', 'Texaco', lignes, () => 999);
     expect(resultat.options[0].tarifTotal).toBe(999);
+  });
+});
+
+describe('lignesDesservantArret', () => {
+  it('retrouve toutes les lignes passant par un arret partage', () => {
+    const ids = lignesDesservantArret('Marché Moungali', lignes).map((l) => l.id);
+
+    expect(ids).toContain('L01');
+    expect(ids).toContain('L03');
+  });
+
+  it('ignore la casse et les espaces autour du nom', () => {
+    const ids = lignesDesservantArret('  marché moungali ', lignes).map((l) => l.id);
+
+    expect(ids).toEqual(lignesDesservantArret('Marché Moungali', lignes).map((l) => l.id));
+  });
+
+  it('renvoie une liste vide pour un arret inconnu', () => {
+    expect(lignesDesservantArret('Arret inexistant', lignes)).toEqual([]);
   });
 });
