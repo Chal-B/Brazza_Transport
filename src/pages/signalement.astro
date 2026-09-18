@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReportForm from '../components/ReportForm.tsx';
+import { getToutesLesLignes } from '../lib/lignes';
+
+const CLE_SITE_TURNSTILE = '0x4AAAAAAE8FVKewhf5YNdVZ';
+
+const lignes = getToutesLesLignes().map((ligne) => ({ id: ligne.id, nom: ligne.nom }));
+---
+
+<BaseLayout
+  titre="Signaler une erreur | Brazza Transport"
+  description="Signalez un tarif incorrect, un tronçonnage abusif ou une ligne qui a changé. Anonyme, sans compte."
+  navActif="signaler"
+>
+  <script
+    slot="head"
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    async
+    defer></script>
+
+  <div class="entete-fiche">
+    <a href="/" class="retour" aria-label="Retour à l’accueil">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </a>
+    <h1 class="titre-fiche titre-resultats">Signaler une erreur</h1>
+  </div>
+
+  <p class="sous-texte mt-4">
+    Sans compte et sans inscription. Dites-nous ce que vous avez constaté sur le terrain, nous le
+    vérifions avant de corriger la fiche.
+  </p>
+
+  <ReportForm client:load lignes={lignes} cleSiteTurnstile={CLE_SITE_TURNSTILE} />
+</BaseLayout>
