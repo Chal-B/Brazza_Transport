@@ -262,6 +262,18 @@ Then un bandeau rouge fixe s'affiche en haut de la page : « Alerte trafic :
      fortes tensions sur le carburant à Brazzaville. Anticipez la hausse des tarifs. »
 ```
 
+**Scénario 2 : alerte carburant sans crise tarifaire**
+```
+Given qu'une alerte de type penurie_carburant est active dans config_globale.json,
+When isFuelCrisisActive vaut false,
+Then le bandeau ne s'affiche pas.
+```
+> Ajouté le 2026-09-18. Les deux réglages étaient indépendants, si bien que
+> l'application annonçait des tensions sur le carburant tout en affichant le
+> tarif normal. Une alerte carburant ne s'affiche donc plus que si la crise est
+> active côté tarifs. Les autres types d'alerte (travaux, etc.) restent pilotés
+> par leur seul champ `actif`.
+
 ### US-05 : Formulaire de signalement d'erreur
 
 *En tant qu'usager constatant un abus de tarif, un changement de trajet ou un tronçonnage abusif, je veux signaler une erreur en 2 clics depuis la fiche de la ligne, afin de contribuer à maintenir les informations de la communauté à jour.*
@@ -292,13 +304,20 @@ Then un message de confirmation apparaît : « Merci ! Votre signalement a été
 
 *En tant qu'usager occasionnel ou nouveau venu à Brazzaville, je veux déplier la liste complète des arrêts intermédiaires avec leurs repères connus (ex. Marché Poto-Poto, CCF, Rond-point Moungali), afin de savoir exactement où descendre ou faire une correspondance.*
 
-**Scénario 1 : dépliage de l'itinéraire**
+**Scénario 1 : consultation de l'itinéraire complet**
 ```
-Given que la fiche de la ligne L01 est affichée en mode réduit,
-When l'utilisateur clique sur « Voir tous les arrêts »,
+Given que l'utilisateur ouvre la fiche de la ligne L01,
+When la page se charge,
 Then la liste ordonnée des arrêts s'affiche sous forme de timeline verticale :
-     Gare Centrale → Marché Poto-Poto → Marché Moungali → Rond-point Moungali.
+     La Gare → Marché Poto-Poto → Marché Moungali → Rond-point Moungali.
 ```
+> Corrigé le 2026-09-18. Ce scénario décrivait un « mode réduit » avec un clic
+> sur « Voir tous les arrêts ». La maquette validée le même jour place la version
+> courte sur l'écran « Toutes les lignes » — carte « N arrêts » plus un lien
+> « Voir » — et déplie la fiche entièrement. Le repli est donc devenu une
+> navigation entre deux écrans, pas un accordéon. Vérifié sur L04 et ses
+> 10 arrêts : la liste complète reste lisible en 390px. Le premier arrêt
+> s'appelait « Gare Centrale », renommé « La Gare » dans lignes.json (voir #9).
 
 ### US-08 : Consultation des tarifs de référence (ajout PM)
 
@@ -640,11 +659,17 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
 
 | Ancienneté de `derniere_verification` | Couleur du badge | Libellé affiché |
 |---|---|---|
-| `null` (date manquante) | Gris | Date de vérification à confirmer |
+| `null` (date manquante) | Hachuré | Date de vérification à confirmer |
 | < 24h | Vert | Vérifié il y a moins de 24h |
 | < 30 jours | Vert | Vérifié le [date] |
 | > 30 jours | Orange | Info à confirmer, vérifié le [date] |
 | `statut_verification = signale_incorrect` | Rouge | Signalé comme incorrect, en attente de vérification |
+
+> Corrigé le 2026-09-18. L'état « date manquante » était gris uni. Il passe au
+> motif hachuré bordé de pointillés (classe `.badge-inconnu`), tel que dessiné
+> dans la maquette : les trois autres états sont des statuts, celui-ci est une
+> absence de donnée, et le gris uni les faisait lire pareil. C'est l'état des
+> 8 lignes tant que #9 n'a pas livré les dates de collecte.
 
 ### 7.4 config_globale.json
 
