@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 import {
   estArretConnu,
   lignesDesservantArret,
+  memeArret,
+  nombreDArrets,
   normaliser,
   rechercherTrajets,
+  segmentDeLigne,
   suggererArrets,
   tousLesArrets,
 } from '../src/lib/search-engine';
+import type { ArretPrincipal } from '../src/lib/types';
+import type { OptionTrajet } from '../src/lib/search-engine';
 import { getToutesLesLignes } from '../src/lib/lignes';
 
 const lignes = getToutesLesLignes();
@@ -235,5 +240,167 @@ describe('estArretConnu — la recherche n accepte que la base', () => {
 
   it('tousLesArrets ne contient aucun doublon', () => {
     expect(new Set(arrets).size).toBe(arrets.length);
+  });
+});
+
+const noms = (arrets: ArretPrincipal[]) => arrets.map((a) => a.nom);
+const trouverOption = (options: OptionTrajet[], ids: string) =>
+  options.find((o) => o.lignes.map((l) => l.id).join('+') === ids);
+
+describe('segmentDeLigne', () => {
+  const l07 = lignes.find((l) => l.id === 'L07')!;
+
+  it('decoupe la portion parcourue dans le sens du JSON', () => {
+    expect(noms(segmentDeLigne(l07, 'Parquet', 'PSP')!)).toEqual([
+      'Parquet',
+      'Nganga Edouard',
+      'Boulevard A',
+      'PSP',
+    ]);
+  });
+
+  it('renvoie la portion a l envers quand on voyage a rebours', () => {
+    expect(noms(segmentDeLigne(l07, 'PSP', 'Parquet')!)).toEqual([
+      'PSP',
+      'Boulevard A',
+      'Nganga Edouard',
+      'Parquet',
+    ]);
+  });
+
+  it('renvoie null si un des deux arrets n est pas sur la ligne', () => {
+    expect(segmentDeLigne(l07, 'Parquet', 'Mikalou')).toBeNull();
+    expect(segmentDeLigne(l07, 'Mikalou', 'Parquet')).toBeNull();
+  });
+});
+
+describe('itineraire affiche sur la page resultats', () => {
+  it('un trajet direct ne montre que les arrets reellement parcourus', () => {
+    const resultat = rechercherTrajets('CCF', 'Jeanne Viale', lignes);
+    const option = trouverOption(resultat.options, 'L07')!;
+
+    expect(option.etapes).toHaveLength(1);
+    expect(noms(option.etapes[0].arrets)).toEqual([
+      'CCF',
+      'Parquet',
+      'Nganga Edouard',
+      'Boulevard A',
+      'PSP',
+      'Rond-point Moungali',
+      'Jeanne Viale',
+    ]);
+    expect(option.etapes[0].montee).toBe('CCF');
+    expect(option.etapes[0].descente).toBe('Jeanne Viale');
+  });
+
+  it('Nganga Edouard vers Commune Moungali coupe L07 puis L08 a la correspondance', () => {
+    const resultat = rechercherTrajets('Nganga Edouard', 'Commune Moungali', lignes);
+    const option = trouverOption(resultat.options, 'L07+L08')!;
+
+    expect(option.arretCorrespondance).toBe('Rond-point Moungali');
+    expect(noms(option.etapes[0].arrets)).toEqual([
+      'Nganga Edouard',
+      'Boulevard A',
+      'PSP',
+      'Rond-point Moungali',
+    ]);
+    expect(noms(option.etapes[1].arrets)).toEqual(['Rond-point Moungali', 'Commune Moungali']);
+    expect(nombreDArrets(option.etapes)).toBe(5);
+  });
+
+  it('chaque etape part de l arret de descente de la precedente', () => {
+    const resultat = rechercherTrajets('Marché Poto-Poto', 'Marché Moukondo', lignes);
+
+    for (const option of resultat.options) {
+      for (let i = 1; i < option.etapes.length; i += 1) {
+        expect(option.etapes[i].montee).toBe(option.etapes[i - 1].descente);
+      }
+    }
+  });
+
+  it('toute option affichee porte un itineraire complet, du depart a l arrivee', () => {
+    const resultat = rechercherTrajets('Nganga Edouard', 'Mazala', lignes);
+
+    for (const option of resultat.options) {
+      const etapes = option.etapes;
+      expect(etapes.length).toBe(option.lignes.length);
+      expect(etapes[0].montee).toBe('Nganga Edouard');
+      expect(etapes[etapes.length - 1].descente).toBe('Mazala');
+    }
+  });
+});
+
+describe('choix de l arret de correspondance', () => {
+  it('retient l arret qui raccourcit le trajet quand deux lignes en partagent plusieurs', () => {
+    const resultat = rechercherTrajets('Mampassi', 'SNE', lignes);
+    const option = trouverOption(resultat.options, 'L07+L02')!;
+
+    expect(option.arretCorrespondance).toBe('CCF');
+    expect(nombreDArrets(option.etapes)).toBeLessThan(15);
+  });
+
+  it('ne propose pas de correspondance a l arret de depart, la seconde ligne suffit', () => {
+    const resultat = rechercherTrajets('Rond-point Moungali', 'Marché Moukondo', lignes);
+
+    expect(resultat.options.every((o) => o.lignes.length === 1)).toBe(true);
+    expect(trouverOption(resultat.options, 'L08')).toBeDefined();
+  });
+});
+
+describe('nombreDArrets', () => {
+  it('compte la correspondance une seule fois', () => {
+    const resultat = rechercherTrajets('Nganga Edouard', 'Commune Moungali', lignes);
+    const option = trouverOption(resultat.options, 'L07+L08')!;
+    const brut = option.etapes.reduce((total, e) => total + e.arrets.length, 0);
+
+    expect(nombreDArrets(option.etapes)).toBe(brut - 1);
+  });
+
+  it('vaut zero sans etape', () => {
+    expect(nombreDArrets([])).toBe(0);
+  });
+});
+
+describe('itineraire coherent sur toutes les paires d arrets du jeu de donnees', () => {
+  const arrets = tousLesArrets(lignes);
+
+  it('chaque option proposee est parcourable du depart a l arrivee', () => {
+    for (const depart of arrets) {
+      for (const arrivee of arrets) {
+        if (memeArret(depart, arrivee)) continue;
+
+        const resultat = rechercherTrajets(depart, arrivee, lignes);
+        if (resultat.statut !== 'resultats') continue;
+
+        for (const option of resultat.options) {
+          expect(option.etapes.length, `${depart} -> ${arrivee}`).toBe(option.lignes.length);
+          expect(memeArret(option.etapes[0].montee, depart)).toBe(true);
+          expect(memeArret(option.etapes[option.etapes.length - 1].descente, arrivee)).toBe(true);
+
+          for (const [index, etape] of option.etapes.entries()) {
+            expect(etape.arrets.length).toBeGreaterThan(1);
+            expect(etape.ligne.id).toBe(option.lignes[index].id);
+            if (index > 0) {
+              expect(memeArret(etape.montee, option.etapes[index - 1].descente)).toBe(true);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it('aucun itineraire ne repasse deux fois par le meme arret', () => {
+    for (const depart of arrets) {
+      for (const arrivee of arrets) {
+        if (memeArret(depart, arrivee)) continue;
+
+        for (const option of rechercherTrajets(depart, arrivee, lignes).options) {
+          const visites = option.etapes.flatMap((etape, index) =>
+            etape.arrets.slice(index > 0 ? 1 : 0).map((arret) => normaliser(arret.nom)),
+          );
+          expect(new Set(visites).size, `${depart} -> ${arrivee}`).toBe(visites.length);
+        }
+      }
+    }
   });
 });

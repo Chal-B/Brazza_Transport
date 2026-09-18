@@ -1,12 +1,22 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
-import { rechercherTrajets } from '../lib/search-engine';
+import { nombreDArrets, rechercherTrajets } from '../lib/search-engine';
 import { creerObtenirTarif } from '../lib/pricing';
 import type { ConfigGlobale, Ligne } from '../lib/types';
-import type { OptionTrajet, ResultatRecherche } from '../lib/search-engine';
+import type { EtapeTrajet, OptionTrajet, ResultatRecherche } from '../lib/search-engine';
 
 interface Props {
   lignes: Ligne[];
   config: ConfigGlobale;
+}
+
+interface PointTrajet {
+  cle: string;
+  nom: string;
+  repere: string | null;
+  role: string | null;
+  bascule: string | null;
+  terminus: boolean;
+  correspondance: boolean;
 }
 
 function journaliser(depart: string, arrivee: string, nbResultats: number) {
@@ -22,8 +32,85 @@ function journaliser(depart: string, arrivee: string, nbResultats: number) {
   }
 }
 
+function pointsDuTrajet(etapes: EtapeTrajet[]): PointTrajet[] {
+  const points: PointTrajet[] = [];
+
+  etapes.forEach((etape, indexEtape) => {
+    const suivante = etapes[indexEtape + 1];
+
+    etape.arrets.forEach((arret, indexArret) => {
+      if (indexEtape > 0 && indexArret === 0) return;
+
+      const premier = indexEtape === 0 && indexArret === 0;
+      const dernierDeLEtape = indexArret === etape.arrets.length - 1;
+      const correspondance = dernierDeLEtape && suivante !== undefined;
+      const dernier = dernierDeLEtape && suivante === undefined;
+
+      points.push({
+        cle: `${etape.ligne.id}-${indexArret}-${arret.nom}`,
+        nom: arret.nom,
+        repere: arret.repere,
+        role: premier ? 'Départ' : correspondance ? 'Correspondance' : dernier ? 'Arrivée' : null,
+        bascule: premier
+          ? `Monter dans ${etape.ligne.id}`
+          : correspondance
+            ? `Descendre, prendre ${suivante.ligne.id}`
+            : null,
+        terminus: premier || dernier,
+        correspondance,
+      });
+    });
+  });
+
+  return points;
+}
+
+function ItineraireTrajet({ etapes }: { etapes: EtapeTrajet[] }) {
+  const points = pointsDuTrajet(etapes);
+
+  return (
+    <ol class="timeline timeline-trajet">
+      {points.map((point) => (
+        <li
+          key={point.cle}
+          class={[
+            'arret',
+            point.terminus ? 'arret-terminus' : '',
+            point.correspondance ? 'arret-correspondance' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
+          <div class="nom-arret">
+            {point.nom}
+            {point.role && <span class="role-arret">{point.role}</span>}
+          </div>
+          {point.repere && <div class="repere-arret">{point.repere}</div>}
+          {point.bascule && (
+            <span class="bascule-ligne">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 9h16l-4-4"></path>
+                <path d="M20 15H4l4 4"></path>
+              </svg>
+              {point.bascule}
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function CarteTrajet({ option }: { option: OptionTrajet }) {
   const correspondance = option.lignes.length > 1;
+  const nbArrets = nombreDArrets(option.etapes);
+
+  const resume =
+    nbArrets > 0
+      ? `${correspondance ? '1 correspondance' : 'Trajet direct'} · ${nbArrets} arrêts`
+      : correspondance
+        ? `1 correspondance${option.arretCorrespondance ? ` · via ${option.arretCorrespondance}` : ''}`
+        : 'Trajet direct, sans correspondance';
 
   return (
     <li class="carte carte-trajet">
@@ -39,16 +126,14 @@ function CarteTrajet({ option }: { option: OptionTrajet }) {
         <span class="badge badge-frais">{option.tarifTotal} FCFA</span>
       </div>
 
-      <p class="sous-texte">
-        {correspondance
-          ? `1 correspondance · via ${option.arretCorrespondance}`
-          : 'Trajet direct, sans correspondance'}
-      </p>
+      <p class="sous-texte">{resume}</p>
+
+      {option.etapes.length > 0 && <ItineraireTrajet etapes={option.etapes} />}
 
       <p class="liens-trajet">
         {option.lignes.map((ligne) => (
           <a key={ligne.id} href={`/lignes/${ligne.id}`} class="bouton-contour">
-            {correspondance ? `Voir ${ligne.id}` : 'Voir le détail'}
+            {correspondance ? `Ligne ${ligne.id} en entier` : 'Voir la ligne en entier'}
           </a>
         ))}
       </p>

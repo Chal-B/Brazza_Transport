@@ -552,7 +552,8 @@
     font-weight: var(--font-weight-medium);
   }
 
-  .correspondance-arret {
+  .correspondance-arret,
+  .bascule-ligne {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -565,7 +566,8 @@
     font-weight: var(--font-weight-fort);
   }
 
-  .correspondance-arret svg {
+  .correspondance-arret svg,
+  .bascule-ligne svg {
     width: 0.85rem;
     height: 0.85rem;
     flex: 0 0 auto;
@@ -987,6 +989,18 @@
   .fleche-correspondance {
     color: var(--color-texte-2);
     font-weight: var(--font-weight-max);
+  }
+
+  .timeline-trajet {
+    margin-top: 0.25rem;
+  }
+
+  .timeline-trajet .arret {
+    padding-bottom: 0.75rem;
+  }
+
+  .timeline-trajet .arret:not(.arret-terminus, .arret-correspondance)::before {
+    background: #fff;
   }
 
   .liens-trajet {

@@ -1,11 +1,19 @@
-import type { Ligne } from './types';
+import type { ArretPrincipal, Ligne } from './types';
 
 export type ObtenirTarif = (ligne: Ligne) => number;
+
+export interface EtapeTrajet {
+  ligne: Ligne;
+  arrets: ArretPrincipal[];
+  montee: string;
+  descente: string;
+}
 
 export interface OptionTrajet {
   lignes: Ligne[];
   arretCorrespondance: string | null;
   tarifTotal: number;
+  etapes: EtapeTrajet[];
 }
 
 export type StatutRecherche =
@@ -44,18 +52,92 @@ function tarifNormalParDefaut(ligne: Ligne): number {
   return ligne.tarification.normal.jour_fcfa;
 }
 
-function dessertArret(ligne: Ligne, arret: string): boolean {
+function indexArret(ligne: Ligne, arret: string): number {
   const cible = normaliser(arret);
-  return ligne.arrets_principaux.some((a) => normaliser(a.nom) === cible);
+  return ligne.arrets_principaux.findIndex((a) => normaliser(a.nom) === cible);
 }
 
-function arretCommun(a: Ligne, b: Ligne): string | null {
-  for (const arretA of a.arrets_principaux) {
-    if (b.arrets_principaux.some((arretB) => normaliser(arretB.nom) === normaliser(arretA.nom))) {
-      return arretA.nom;
+function dessertArret(ligne: Ligne, arret: string): boolean {
+  return indexArret(ligne, arret) !== -1;
+}
+
+function arretsCommuns(a: Ligne, b: Ligne): string[] {
+  return a.arrets_principaux.filter((arret) => dessertArret(b, arret.nom)).map((arret) => arret.nom);
+}
+
+function meilleureCorrespondance(
+  a: Ligne,
+  b: Ligne,
+  depart: string,
+  arrivee: string,
+): string | null {
+  const departSurA = indexArret(a, depart);
+  const arriveeSurB = indexArret(b, arrivee);
+
+  let retenu: string | null = null;
+  let coutRetenu = Number.POSITIVE_INFINITY;
+
+  for (const arret of arretsCommuns(a, b)) {
+    const cout =
+      Math.abs(indexArret(a, arret) - departSurA) + Math.abs(arriveeSurB - indexArret(b, arret));
+    if (cout < coutRetenu) {
+      coutRetenu = cout;
+      retenu = arret;
     }
   }
-  return null;
+
+  return retenu;
+}
+
+export function segmentDeLigne(
+  ligne: Ligne,
+  montee: string,
+  descente: string,
+): ArretPrincipal[] | null {
+  const debut = indexArret(ligne, montee);
+  const fin = indexArret(ligne, descente);
+  if (debut === -1 || fin === -1) return null;
+
+  const tranche = ligne.arrets_principaux.slice(Math.min(debut, fin), Math.max(debut, fin) + 1);
+  return debut <= fin ? tranche : [...tranche].reverse();
+}
+
+function construireEtape(ligne: Ligne, montee: string, descente: string): EtapeTrajet | null {
+  const arrets = segmentDeLigne(ligne, montee, descente);
+  if (arrets === null || arrets.length === 0) return null;
+
+  return {
+    ligne,
+    arrets,
+    montee: arrets[0].nom,
+    descente: arrets[arrets.length - 1].nom,
+  };
+}
+
+function construireEtapes(
+  lignesDuTrajet: Ligne[],
+  depart: string,
+  arrivee: string,
+  correspondance: string | null,
+): EtapeTrajet[] {
+  if (lignesDuTrajet.length === 1) {
+    const etape = construireEtape(lignesDuTrajet[0], depart, arrivee);
+    return etape === null ? [] : [etape];
+  }
+
+  if (correspondance === null) return [];
+
+  const premiere = construireEtape(lignesDuTrajet[0], depart, correspondance);
+  const seconde = construireEtape(lignesDuTrajet[1], correspondance, arrivee);
+  return premiere === null || seconde === null ? [] : [premiere, seconde];
+}
+
+export function nombreDArrets(etapes: EtapeTrajet[]): number {
+  if (etapes.length === 0) return 0;
+  return etapes.reduce(
+    (total, etape, index) => total + etape.arrets.length - (index > 0 ? 1 : 0),
+    0,
+  );
 }
 
 export function lignesDesservantArret(arret: string, lignes: Ligne[]): Ligne[] {
@@ -103,7 +185,7 @@ export function rechercherTrajets(
   lignes: Ligne[],
   obtenirTarif: ObtenirTarif = tarifNormalParDefaut,
 ): ResultatRecherche {
-  if (normaliser(depart) === normaliser(arrivee)) {
+  if (memeArret(depart, arrivee)) {
     return { statut: 'meme_arret', options: [], nbResultatsPourLog: 0 };
   }
 
@@ -117,6 +199,7 @@ export function rechercherTrajets(
         lignes: [ligne],
         arretCorrespondance: null,
         tarifTotal: obtenirTarif(ligne),
+        etapes: construireEtapes([ligne], depart, arrivee, null),
       });
     }
   }
@@ -125,10 +208,11 @@ export function rechercherTrajets(
   for (const ligneA of lignesDepart) {
     for (const ligneB of lignesArrivee) {
       if (ligneA.id === ligneB.id) continue;
+      const communs = arretsCommuns(ligneA, ligneB);
       const sontConnectees =
         (ligneA.correspondances_possibles ?? []).includes(ligneB.id) ||
         (ligneB.correspondances_possibles ?? []).includes(ligneA.id) ||
-        arretCommun(ligneA, ligneB) !== null;
+        communs.length > 0;
       if (!sontConnectees) continue;
 
       const dejaTrouvee = optionsCorrespondance.some(
@@ -138,10 +222,19 @@ export function rechercherTrajets(
       );
       if (dejaTrouvee) continue;
 
+      const correspondance = meilleureCorrespondance(ligneA, ligneB, depart, arrivee);
+      if (
+        correspondance !== null &&
+        (memeArret(correspondance, depart) || memeArret(correspondance, arrivee))
+      ) {
+        continue;
+      }
+
       optionsCorrespondance.push({
         lignes: [ligneA, ligneB],
-        arretCorrespondance: arretCommun(ligneA, ligneB),
+        arretCorrespondance: correspondance,
         tarifTotal: obtenirTarif(ligneA) + obtenirTarif(ligneB),
+        etapes: construireEtapes([ligneA, ligneB], depart, arrivee, correspondance),
       });
     }
   }
