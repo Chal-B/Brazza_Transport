@@ -18,3 +18,34 @@ create policy "insertion anonyme d une recherche"
   for insert
   to anon
   with check (true);
+
+create table if not exists public.signalements (
+  id bigint generated always as identity primary key,
+  motif text not null check (
+    motif in (
+      'tronconnage_abusif',
+      'tarif_incorrect',
+      'ligne_arret_incorrect',
+      'ligne_supprimee',
+      'autre'
+    )
+  ),
+  ligne_id text check (ligne_id is null or char_length(ligne_id) between 1 and 20),
+  description text not null check (char_length(description) between 10 and 2000),
+  contact text check (contact is null or char_length(contact) between 1 and 120),
+  statut text not null default 'nouveau' check (statut in ('nouveau', 'traite')),
+  cree_le timestamptz not null default now()
+);
+
+create index if not exists signalements_statut_cree_le_idx
+  on public.signalements (statut, cree_le desc);
+
+alter table public.signalements enable row level security;
+
+drop policy if exists "depot anonyme d un signalement" on public.signalements;
+
+create policy "depot anonyme d un signalement"
+  on public.signalements
+  for insert
+  to anon
+  with check (statut = 'nouveau');
