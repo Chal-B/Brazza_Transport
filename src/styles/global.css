@@ -1011,17 +1011,52 @@
     gap: 0.6rem;
   }
 
-  .voir-itineraire {
+  .trajet-repliable > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .controle-repli {
+    display: inline-flex;
     flex: 0 0 auto;
+    align-items: center;
+    gap: 0.3rem;
     color: var(--color-texte);
     font-size: var(--text-petit);
     font-weight: var(--font-weight-fort);
+  }
+
+  .libelle-repli-ouvrir,
+  .libelle-repli-fermer {
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
 
-  .trajet-repliable[open] > summary .voir-itineraire {
+  .libelle-repli-fermer {
     display: none;
+  }
+
+  .trajet-repliable[open] > summary .libelle-repli-ouvrir {
+    display: none;
+  }
+
+  .trajet-repliable[open] > summary .libelle-repli-fermer {
+    display: inline;
+  }
+
+  .chevron-repli {
+    width: 0.85rem;
+    height: 0.85rem;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.15s ease;
+  }
+
+  .trajet-repliable[open] > summary .chevron-repli {
+    transform: rotate(180deg);
   }
 
   .liens-trajet {

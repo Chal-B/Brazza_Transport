@@ -147,7 +147,13 @@ function CarteTrajet({ option, deplie }: { option: OptionTrajet; deplie: boolean
         <details class="trajet-repliable">
           <summary class="sous-texte">
             {resume}
-            <span class="voir-itineraire">Voir l’itinéraire</span>
+            <span class="controle-repli">
+              <span class="libelle-repli-ouvrir">Voir l’itinéraire</span>
+              <span class="libelle-repli-fermer">Réduire</span>
+              <svg class="chevron-repli" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
           </summary>
           {itineraire}
         </details>
