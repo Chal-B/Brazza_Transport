@@ -999,7 +999,7 @@
     padding-bottom: 0.75rem;
   }
 
-  .timeline-trajet .arret:not(.arret-terminus, .arret-correspondance)::before {
+  .timeline-trajet .arret:not(.arret-terminus):not(.arret-correspondance)::before {
     background: #fff;
   }
 
