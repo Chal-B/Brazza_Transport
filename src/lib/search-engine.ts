@@ -11,22 +11,21 @@ export interface EtapeTrajet {
 
 export interface OptionTrajet {
   lignes: Ligne[];
-  arretCorrespondance: string | null;
+  correspondances: string[];
   tarifTotal: number;
   etapes: EtapeTrajet[];
 }
 
-export type StatutRecherche =
-  | 'resultats'
-  | 'aucun_resultat'
-  | 'trop_de_correspondances'
-  | 'meme_arret';
+export type StatutRecherche = 'resultats' | 'aucun_resultat' | 'meme_arret';
 
 export interface ResultatRecherche {
   statut: StatutRecherche;
   options: OptionTrajet[];
   nbResultatsPourLog: number;
 }
+
+const MAX_OPTIONS = 4;
+const MAX_SEQUENCES_EXPLOREES = 400;
 
 export function normaliser(valeur: string): string {
   return valeur
@@ -65,24 +64,122 @@ function arretsCommuns(a: Ligne, b: Ligne): string[] {
   return a.arrets_principaux.filter((arret) => dessertArret(b, arret.nom)).map((arret) => arret.nom);
 }
 
-function meilleureCorrespondance(
-  a: Ligne,
-  b: Ligne,
+function construireVoisinages(lignes: Ligne[]): Map<string, Ligne[]> {
+  const voisinages = new Map<string, Ligne[]>();
+
+  for (const ligne of lignes) {
+    voisinages.set(
+      ligne.id,
+      lignes.filter((autre) => autre.id !== ligne.id && arretsCommuns(ligne, autre).length > 0),
+    );
+  }
+
+  return voisinages;
+}
+
+function sequencesMinimales(depart: string, arrivee: string, lignes: Ligne[]): Ligne[][] {
+  const lignesDepart = lignes.filter((ligne) => dessertArret(ligne, depart));
+  const idsArrivee = new Set(
+    lignes.filter((ligne) => dessertArret(ligne, arrivee)).map((ligne) => ligne.id),
+  );
+  if (lignesDepart.length === 0 || idsArrivee.size === 0) return [];
+
+  const voisinages = construireVoisinages(lignes);
+  const distance = new Map<string, number>();
+  let front = lignesDepart;
+  for (const ligne of front) distance.set(ligne.id, 1);
+
+  let profondeurArrivee = 0;
+  while (front.length > 0 && profondeurArrivee === 0) {
+    const suivant: Ligne[] = [];
+    for (const ligne of front) {
+      if (idsArrivee.has(ligne.id)) {
+        profondeurArrivee = distance.get(ligne.id) as number;
+        break;
+      }
+      for (const voisine of voisinages.get(ligne.id) ?? []) {
+        if (distance.has(voisine.id)) continue;
+        distance.set(voisine.id, (distance.get(ligne.id) as number) + 1);
+        suivant.push(voisine);
+      }
+    }
+    if (profondeurArrivee !== 0) break;
+    front = suivant;
+  }
+
+  if (profondeurArrivee === 0) return [];
+
+  const sequences: Ligne[][] = [];
+  const parcourir = (chemin: Ligne[]) => {
+    if (sequences.length >= MAX_SEQUENCES_EXPLOREES) return;
+    const derniere = chemin[chemin.length - 1];
+
+    if (chemin.length === profondeurArrivee) {
+      if (idsArrivee.has(derniere.id)) sequences.push(chemin);
+      return;
+    }
+
+    for (const voisine of voisinages.get(derniere.id) ?? []) {
+      if (distance.get(voisine.id) !== chemin.length + 1) continue;
+      parcourir([...chemin, voisine]);
+    }
+  };
+
+  for (const ligne of lignesDepart) {
+    if (distance.get(ligne.id) === 1) parcourir([ligne]);
+  }
+
+  return sequences;
+}
+
+function correspondancesLesPlusCourtes(
+  sequence: Ligne[],
   depart: string,
   arrivee: string,
-): string | null {
-  const departSurA = indexArret(a, depart);
-  const arriveeSurB = indexArret(b, arrivee);
+): string[] | null {
+  if (sequence.length === 1) {
+    return indexArret(sequence[0], depart) === indexArret(sequence[0], arrivee) ? null : [];
+  }
 
-  let retenu: string | null = null;
+  let etats = new Map<string, { cout: number; arrets: string[] }>();
+  for (const arret of arretsCommuns(sequence[0], sequence[1])) {
+    const cout = Math.abs(indexArret(sequence[0], arret) - indexArret(sequence[0], depart));
+    if (cout === 0) continue;
+    const connu = etats.get(arret);
+    if (connu === undefined || cout < connu.cout) etats.set(arret, { cout, arrets: [arret] });
+  }
+
+  for (let rang = 1; rang < sequence.length - 1; rang += 1) {
+    const suivants = new Map<string, { cout: number; arrets: string[] }>();
+
+    for (const [precedent, etat] of etats) {
+      for (const arret of arretsCommuns(sequence[rang], sequence[rang + 1])) {
+        const trajet = Math.abs(
+          indexArret(sequence[rang], arret) - indexArret(sequence[rang], precedent),
+        );
+        if (trajet === 0) continue;
+        const cout = etat.cout + trajet;
+        const connu = suivants.get(arret);
+        if (connu === undefined || cout < connu.cout) {
+          suivants.set(arret, { cout, arrets: [...etat.arrets, arret] });
+        }
+      }
+    }
+
+    etats = suivants;
+  }
+
+  const derniere = sequence[sequence.length - 1];
+  let retenu: string[] | null = null;
   let coutRetenu = Number.POSITIVE_INFINITY;
 
-  for (const arret of arretsCommuns(a, b)) {
-    const cout =
-      Math.abs(indexArret(a, arret) - departSurA) + Math.abs(arriveeSurB - indexArret(b, arret));
+  for (const [precedent, etat] of etats) {
+    const trajet = Math.abs(indexArret(derniere, arrivee) - indexArret(derniere, precedent));
+    if (trajet === 0) continue;
+    const cout = etat.cout + trajet;
     if (cout < coutRetenu) {
       coutRetenu = cout;
-      retenu = arret;
+      retenu = etat.arrets;
     }
   }
 
@@ -102,42 +199,42 @@ export function segmentDeLigne(
   return debut <= fin ? tranche : [...tranche].reverse();
 }
 
-function construireEtape(ligne: Ligne, montee: string, descente: string): EtapeTrajet | null {
-  const arrets = segmentDeLigne(ligne, montee, descente);
-  if (arrets === null || arrets.length === 0) return null;
-
-  return {
-    ligne,
-    arrets,
-    montee: arrets[0].nom,
-    descente: arrets[arrets.length - 1].nom,
-  };
-}
-
 function construireEtapes(
-  lignesDuTrajet: Ligne[],
+  sequence: Ligne[],
   depart: string,
   arrivee: string,
-  correspondance: string | null,
+  correspondances: string[],
 ): EtapeTrajet[] {
-  if (lignesDuTrajet.length === 1) {
-    const etape = construireEtape(lignesDuTrajet[0], depart, arrivee);
-    return etape === null ? [] : [etape];
+  const jalons = [depart, ...correspondances, arrivee];
+  const etapes: EtapeTrajet[] = [];
+
+  for (const [rang, ligne] of sequence.entries()) {
+    const arrets = segmentDeLigne(ligne, jalons[rang], jalons[rang + 1]);
+    if (arrets === null || arrets.length < 2) return [];
+    etapes.push({
+      ligne,
+      arrets,
+      montee: arrets[0].nom,
+      descente: arrets[arrets.length - 1].nom,
+    });
   }
 
-  if (correspondance === null) return [];
+  return etapes;
+}
 
-  const premiere = construireEtape(lignesDuTrajet[0], depart, correspondance);
-  const seconde = construireEtape(lignesDuTrajet[1], correspondance, arrivee);
-  return premiere === null || seconde === null ? [] : [premiere, seconde];
+export function arretsParcourus(etapes: EtapeTrajet[]): string[] {
+  return etapes.flatMap((etape, rang) =>
+    etape.arrets.slice(rang > 0 ? 1 : 0).map((arret) => arret.nom),
+  );
 }
 
 export function nombreDArrets(etapes: EtapeTrajet[]): number {
-  if (etapes.length === 0) return 0;
-  return etapes.reduce(
-    (total, etape, index) => total + etape.arrets.length - (index > 0 ? 1 : 0),
-    0,
-  );
+  return arretsParcourus(etapes).length;
+}
+
+function repasseParLeMemeArret(etapes: EtapeTrajet[]): boolean {
+  const visites = arretsParcourus(etapes).map(normaliser);
+  return new Set(visites).size !== visites.length;
 }
 
 export function lignesDesservantArret(arret: string, lignes: Ligne[]): Ligne[] {
@@ -189,67 +286,39 @@ export function rechercherTrajets(
     return { statut: 'meme_arret', options: [], nbResultatsPourLog: 0 };
   }
 
-  const lignesDepart = lignes.filter((l) => dessertArret(l, depart));
-  const lignesArrivee = lignes.filter((l) => dessertArret(l, arrivee));
+  const options: OptionTrajet[] = [];
+  const vues = new Set<string>();
 
-  const optionsDirectes: OptionTrajet[] = [];
-  for (const ligne of lignesDepart) {
-    if (lignesArrivee.some((l) => l.id === ligne.id)) {
-      optionsDirectes.push({
-        lignes: [ligne],
-        arretCorrespondance: null,
-        tarifTotal: obtenirTarif(ligne),
-        etapes: construireEtapes([ligne], depart, arrivee, null),
-      });
-    }
+  for (const sequence of sequencesMinimales(depart, arrivee, lignes)) {
+    const correspondances = correspondancesLesPlusCourtes(sequence, depart, arrivee);
+    if (correspondances === null) continue;
+
+    const etapes = construireEtapes(sequence, depart, arrivee, correspondances);
+    if (etapes.length === 0 || repasseParLeMemeArret(etapes)) continue;
+
+    const signature = etapes.map((etape) => `${etape.ligne.id}:${etape.montee}`).join('>');
+    if (vues.has(signature)) continue;
+    vues.add(signature);
+
+    options.push({
+      lignes: sequence,
+      correspondances,
+      tarifTotal: sequence.reduce((total, ligne) => total + obtenirTarif(ligne), 0),
+      etapes,
+    });
   }
 
-  const optionsCorrespondance: OptionTrajet[] = [];
-  for (const ligneA of lignesDepart) {
-    for (const ligneB of lignesArrivee) {
-      if (ligneA.id === ligneB.id) continue;
-      const communs = arretsCommuns(ligneA, ligneB);
-      const sontConnectees =
-        (ligneA.correspondances_possibles ?? []).includes(ligneB.id) ||
-        (ligneB.correspondances_possibles ?? []).includes(ligneA.id) ||
-        communs.length > 0;
-      if (!sontConnectees) continue;
-
-      const dejaTrouvee = optionsCorrespondance.some(
-        (o) =>
-          (o.lignes[0].id === ligneA.id && o.lignes[1].id === ligneB.id) ||
-          (o.lignes[0].id === ligneB.id && o.lignes[1].id === ligneA.id),
-      );
-      if (dejaTrouvee) continue;
-
-      const correspondance = meilleureCorrespondance(ligneA, ligneB, depart, arrivee);
-      if (
-        correspondance !== null &&
-        (memeArret(correspondance, depart) || memeArret(correspondance, arrivee))
-      ) {
-        continue;
-      }
-
-      optionsCorrespondance.push({
-        lignes: [ligneA, ligneB],
-        arretCorrespondance: correspondance,
-        tarifTotal: obtenirTarif(ligneA) + obtenirTarif(ligneB),
-        etapes: construireEtapes([ligneA, ligneB], depart, arrivee, correspondance),
-      });
-    }
-  }
-
-  if (optionsDirectes.length === 0 && optionsCorrespondance.length === 0) {
-    if (lignesDepart.length > 0 && lignesArrivee.length > 0) {
-      return { statut: 'trop_de_correspondances', options: [], nbResultatsPourLog: -1 };
-    }
+  if (options.length === 0) {
     return { statut: 'aucun_resultat', options: [], nbResultatsPourLog: 0 };
   }
 
-  const options = [
-    ...optionsDirectes.sort((a, b) => a.tarifTotal - b.tarifTotal),
-    ...optionsCorrespondance.sort((a, b) => a.tarifTotal - b.tarifTotal),
-  ];
+  options.sort(
+    (a, b) =>
+      a.lignes.length - b.lignes.length ||
+      a.tarifTotal - b.tarifTotal ||
+      nombreDArrets(a.etapes) - nombreDArrets(b.etapes),
+  );
 
-  return { statut: 'resultats', options, nbResultatsPourLog: options.length };
+  const retenues = options.slice(0, MAX_OPTIONS);
+  return { statut: 'resultats', options: retenues, nbResultatsPourLog: retenues.length };
 }

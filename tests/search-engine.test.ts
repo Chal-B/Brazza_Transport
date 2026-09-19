@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  arretsParcourus,
   estArretConnu,
   lignesDesservantArret,
   memeArret,
@@ -35,7 +36,7 @@ describe('rechercherTrajets — scenario 1 : recherche avec resultat existant (U
     expect(resultat.statut).toBe('resultats');
     expect(resultat.options).toHaveLength(1);
     expect(resultat.options[0].lignes.map((l) => l.id)).toEqual(['L03']);
-    expect(resultat.options[0].arretCorrespondance).toBeNull();
+    expect(resultat.options[0].correspondances).toEqual([]);
   });
 
   it('trie les resultats directs avant les resultats a 1 correspondance', () => {
@@ -65,12 +66,31 @@ describe('rechercherTrajets — scenario 2 : recherche sans resultat (US-02 sc.2
   });
 });
 
-describe('rechercherTrajets — scenario 3 : plus d\'une correspondance necessaire (US-02 sc.3)', () => {
-  it('un trajet a 2+ correspondances ne retourne aucune option, avec un log distinct', () => {
+describe('rechercherTrajets — scenario 3 : trajets a plusieurs correspondances', () => {
+  it('un trajet demandant plusieurs correspondances est desormais propose', () => {
     const resultat = rechercherTrajets('La Gare', 'Marché Talangaï', lignes);
-    expect(resultat.statut).toBe('trop_de_correspondances');
-    expect(resultat.options).toHaveLength(0);
-    expect(resultat.nbResultatsPourLog).toBe(-1);
+
+    expect(resultat.statut).toBe('resultats');
+    expect(resultat.options.length).toBeGreaterThan(0);
+    expect(resultat.options[0].correspondances.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('Kombo vers La Milice traverse le reseau en 3 changements', () => {
+    const resultat = rechercherTrajets('Kombo', 'La Milice', lignes);
+
+    expect(resultat.statut).toBe('resultats');
+    const [meilleure] = resultat.options;
+    expect(meilleure.lignes.map((l) => l.id)).toEqual(['L06', 'L08', 'L07', 'L02']);
+    expect(meilleure.correspondances).toEqual(['Mazala', 'Rond-point Moungali', 'CCF']);
+    expect(meilleure.tarifTotal).toBe(600);
+    expect(nombreDArrets(meilleure.etapes)).toBe(17);
+  });
+
+  it('aucun_resultat ne sort que si aucune chaine de lignes ne relie les deux arrets', () => {
+    const resultat = rechercherTrajets('La Gare', 'Quartier Inexistant', lignes);
+
+    expect(resultat.statut).toBe('aucun_resultat');
+    expect(resultat.nbResultatsPourLog).toBe(0);
   });
 });
 
@@ -95,7 +115,7 @@ describe('correspondance a Rond-point Moungali (L01, L07, L08)', () => {
       (o) => o.lignes.map((l) => l.id).sort().join(',') === 'L01,L08',
     );
     expect(option).toBeDefined();
-    expect(option?.arretCorrespondance).toBe('Rond-point Moungali');
+    expect(option?.correspondances).toEqual(['Rond-point Moungali']);
   });
 
   it('relie L07 et L08 via Rond-point Moungali', () => {
@@ -126,7 +146,7 @@ describe('recherche traversant La Gare — comportement decide en #9', () => {
       (o) => o.lignes.map((l) => l.id).sort().join(',') === 'L01,L02',
     );
     expect(option).toBeDefined();
-    expect(option?.arretCorrespondance).toBe('La Gare');
+    expect(option?.correspondances).toEqual(['La Gare']);
   });
 });
 
@@ -297,7 +317,7 @@ describe('itineraire affiche sur la page resultats', () => {
     const resultat = rechercherTrajets('Nganga Edouard', 'Commune Moungali', lignes);
     const option = trouverOption(resultat.options, 'L07+L08')!;
 
-    expect(option.arretCorrespondance).toBe('Rond-point Moungali');
+    expect(option.correspondances).toEqual(['Rond-point Moungali']);
     expect(noms(option.etapes[0].arrets)).toEqual([
       'Nganga Edouard',
       'Boulevard A',
@@ -335,7 +355,7 @@ describe('choix de l arret de correspondance', () => {
     const resultat = rechercherTrajets('Mampassi', 'SNE', lignes);
     const option = trouverOption(resultat.options, 'L07+L02')!;
 
-    expect(option.arretCorrespondance).toBe('CCF');
+    expect(option.correspondances).toEqual(['CCF']);
     expect(nombreDArrets(option.etapes)).toBeLessThan(15);
   });
 
@@ -362,45 +382,49 @@ describe('nombreDArrets', () => {
 });
 
 describe('itineraire coherent sur toutes les paires d arrets du jeu de donnees', () => {
-  const arrets = tousLesArrets(lignes);
+  it(
+    'chaque option proposee est parcourable, complete, et ne repasse jamais au meme endroit',
+    () => {
+      const arrets = tousLesArrets(lignes);
+      let pairesReliees = 0;
 
-  it('chaque option proposee est parcourable du depart a l arrivee', () => {
-    for (const depart of arrets) {
-      for (const arrivee of arrets) {
-        if (memeArret(depart, arrivee)) continue;
+      for (const depart of arrets) {
+        for (const arrivee of arrets) {
+          if (memeArret(depart, arrivee)) continue;
 
-        const resultat = rechercherTrajets(depart, arrivee, lignes);
-        if (resultat.statut !== 'resultats') continue;
+          const resultat = rechercherTrajets(depart, arrivee, lignes);
+          if (resultat.statut !== 'resultats') continue;
+          pairesReliees += 1;
 
-        for (const option of resultat.options) {
-          expect(option.etapes.length, `${depart} -> ${arrivee}`).toBe(option.lignes.length);
-          expect(memeArret(option.etapes[0].montee, depart)).toBe(true);
-          expect(memeArret(option.etapes[option.etapes.length - 1].descente, arrivee)).toBe(true);
+          for (const option of resultat.options) {
+            const contexte = `${depart} -> ${arrivee}`;
 
-          for (const [index, etape] of option.etapes.entries()) {
-            expect(etape.arrets.length).toBeGreaterThan(1);
-            expect(etape.ligne.id).toBe(option.lignes[index].id);
-            if (index > 0) {
-              expect(memeArret(etape.montee, option.etapes[index - 1].descente)).toBe(true);
+            expect(option.etapes.length, contexte).toBe(option.lignes.length);
+            expect(option.correspondances.length, contexte).toBe(option.lignes.length - 1);
+            expect(memeArret(option.etapes[0].montee, depart), contexte).toBe(true);
+            expect(
+              memeArret(option.etapes[option.etapes.length - 1].descente, arrivee),
+              contexte,
+            ).toBe(true);
+
+            for (const [rang, etape] of option.etapes.entries()) {
+              expect(etape.arrets.length, contexte).toBeGreaterThan(1);
+              expect(etape.ligne.id, contexte).toBe(option.lignes[rang].id);
+              if (rang > 0) {
+                expect(memeArret(etape.montee, option.etapes[rang - 1].descente), contexte).toBe(
+                  true,
+                );
+              }
             }
+
+            const visites = arretsParcourus(option.etapes).map(normaliser);
+            expect(new Set(visites).size, contexte).toBe(visites.length);
           }
         }
       }
-    }
-  });
 
-  it('aucun itineraire ne repasse deux fois par le meme arret', () => {
-    for (const depart of arrets) {
-      for (const arrivee of arrets) {
-        if (memeArret(depart, arrivee)) continue;
-
-        for (const option of rechercherTrajets(depart, arrivee, lignes).options) {
-          const visites = option.etapes.flatMap((etape, index) =>
-            etape.arrets.slice(index > 0 ? 1 : 0).map((arret) => normaliser(arret.nom)),
-          );
-          expect(new Set(visites).size, `${depart} -> ${arrivee}`).toBe(visites.length);
-        }
-      }
-    }
-  });
+      expect(pairesReliees).toBe(arrets.length * (arrets.length - 1));
+    },
+    30_000,
+  );
 });

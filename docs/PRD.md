@@ -129,7 +129,6 @@ Délivrer une application web responsive permettant la recherche d'itinéraires 
 - Paiement Mobile Money / achat de tickets en ligne.
 - Géolocalisation GPS en temps réel des véhicules.
 - Compte utilisateur / authentification.
-- Plus d'une correspondance dans les résultats de recherche.
 - Couverture de tous les quartiers de Brazzaville.
 - Application mobile native (le produit est un site web responsive).
 
@@ -199,14 +198,21 @@ Then un message clair s'affiche : « Aucune ligne trouvée sur le corridor prior
      signalement (« Vous connaissez une ligne ? Aidez-nous »).
 ```
 
-**Scénario 3 : plus d'une correspondance nécessaire**
+**Scénario 3 : plusieurs correspondances nécessaires**
 ```
 Given qu'aucun trajet direct ni à 1 correspondance ne relie X à Y,
 When la recherche s'exécute,
-Then le résultat n'est pas affiché à l'utilisateur (hors scope MVP, pour ne pas
-     donner une fausse impression de fiabilité), mais la recherche est loguée
-     côté serveur pour prioriser la V2.
+Then l'application affiche la chaîne de lignes la plus courte qui les relie,
+     avec le nombre de changements, le tarif cumulé et l'arrêt où descendre
+     à chaque changement.
 ```
+
+> Corrigé le 2026-09-19. Ce scénario demandait auparavant de **ne rien
+> afficher** au-delà d'une correspondance et de loguer la recherche pour la V2.
+> Mesuré sur les 8 lignes : 1 218 des 2 256 paires d'arrêts, soit 54 % du
+> réseau, tombaient dans ce cas et renvoyaient « aucune ligne trouvée » alors
+> qu'une chaîne de lignes existait. Le message était faux et l'application
+> paraissait cassée. Le plafond est levé (décision du 2026-09-19).
 
 **Scénario 4 : quartier de départ = quartier d'arrivée**
 ```
@@ -734,14 +740,15 @@ Objectif : amener l'utilisateur à la recherche en moins de 5 secondes.
 **Comportement fonctionnel :**
 
 1. L'utilisateur saisit ou sélectionne un quartier/arrêt de départ et d'arrivée (champ autocomplete basé sur les valeurs présentes dans le JSON, pas de saisie libre non contrôlée).
-2. Le moteur cherche un trajet direct, puis un trajet avec une seule correspondance (via `correspondances_possibles` ou détection d'arrêt commun — ex. Marché Moungali relie L01 et L03).
-3. Les résultats sont triés : trajet direct d'abord, puis 1 correspondance, triés par tarif total croissant (le tarif utilisé pour le tri est le tarif dynamique courant selon l'heure et le mode crise, F4).
-4. Chaque résultat affiche : nom de la/les ligne(s), tarif total estimé (avec badge normal/pointe/crise), nombre de correspondances, bouton « Voir le détail ».
+2. Le moteur parcourt le réseau de lignes en largeur d'abord et retient les chaînes comportant le **moins de changements possible**, sans plafond. Deux lignes sont reliées si elles partagent un arrêt réel, ou si `correspondances_possibles` le déclare.
+3. Pour chaque chaîne retenue, les arrêts de correspondance sont choisis de façon à minimiser le nombre d'arrêts parcourus. Une chaîne qui repasserait deux fois par le même arrêt est écartée.
+4. Les résultats sont triés par nombre de changements croissant, puis par tarif total (tarif dynamique courant selon l'heure et le mode crise, F4), puis par nombre d'arrêts.
+5. Chaque résultat affiche : les lignes à emprunter dans l'ordre, le tarif total estimé (avec badge normal/pointe/crise), le nombre de changements, et l'itinéraire arrêt par arrêt avec la ligne à prendre à chaque changement. Le premier résultat est déplié, les suivants sont repliables.
 
 **Cas limites à gérer :**
 
 - Aucun résultat trouvé → message clair + lien vers le formulaire de signalement.
-- Plus d'une correspondance nécessaire → ne pas afficher, logger en interne pour le PM.
+- Aucune chaîne de lignes ne relie les deux arrêts → message clair + lien vers le formulaire de signalement, et la recherche est loguée pour prioriser l'extension du corridor.
 - Quartier de départ = quartier d'arrivée → message d'erreur de saisie.
 
 ### 8.3 Fiche détaillée d'une ligne
@@ -811,7 +818,6 @@ Objectif : amener l'utilisateur à la recherche en moins de 5 secondes.
 
 - Géolocalisation / carte interactive type Google Maps.
 - Compte utilisateur / authentification.
-- Plus d'une correspondance dans les résultats de recherche.
 - Couverture de tous les quartiers de Brazzaville.
 - Application mobile native (le MVP est un site web, responsive).
 - Paiement ou réservation en ligne (Mobile Money inclus).

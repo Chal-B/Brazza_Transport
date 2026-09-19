@@ -101,16 +101,28 @@ function ItineraireTrajet({ etapes }: { etapes: EtapeTrajet[] }) {
   );
 }
 
-function CarteTrajet({ option }: { option: OptionTrajet }) {
-  const correspondance = option.lignes.length > 1;
+function CarteTrajet({ option, deplie }: { option: OptionTrajet; deplie: boolean }) {
+  const nbChangements = option.correspondances.length;
   const nbArrets = nombreDArrets(option.etapes);
 
-  const resume =
-    nbArrets > 0
-      ? `${correspondance ? '1 correspondance' : 'Trajet direct'} · ${nbArrets} arrêts`
-      : correspondance
-        ? `1 correspondance${option.arretCorrespondance ? ` · via ${option.arretCorrespondance}` : ''}`
-        : 'Trajet direct, sans correspondance';
+  const changements =
+    nbChangements === 0
+      ? 'Trajet direct'
+      : `${nbChangements} correspondance${nbChangements > 1 ? 's' : ''}`;
+  const resume = `${changements} · ${nbArrets} arrêts`;
+
+  const itineraire = (
+    <>
+      <ItineraireTrajet etapes={option.etapes} />
+      <p class="liens-trajet">
+        {option.lignes.map((ligne) => (
+          <a key={ligne.id} href={`/lignes/${ligne.id}`} class="bouton-contour">
+            {nbChangements === 0 ? 'Voir la ligne en entier' : `Ligne ${ligne.id} en entier`}
+          </a>
+        ))}
+      </p>
+    </>
+  );
 
   return (
     <li class="carte carte-trajet">
@@ -126,17 +138,20 @@ function CarteTrajet({ option }: { option: OptionTrajet }) {
         <span class="badge badge-frais">{option.tarifTotal} FCFA</span>
       </div>
 
-      <p class="sous-texte">{resume}</p>
-
-      {option.etapes.length > 0 && <ItineraireTrajet etapes={option.etapes} />}
-
-      <p class="liens-trajet">
-        {option.lignes.map((ligne) => (
-          <a key={ligne.id} href={`/lignes/${ligne.id}`} class="bouton-contour">
-            {correspondance ? `Ligne ${ligne.id} en entier` : 'Voir la ligne en entier'}
-          </a>
-        ))}
-      </p>
+      {deplie ? (
+        <>
+          <p class="sous-texte">{resume}</p>
+          {itineraire}
+        </>
+      ) : (
+        <details class="trajet-repliable">
+          <summary class="sous-texte">
+            {resume}
+            <span class="voir-itineraire">Voir l’itinéraire</span>
+          </summary>
+          {itineraire}
+        </details>
+      )}
     </li>
   );
 }
@@ -146,8 +161,8 @@ function SansResultat({ depart, arrivee }: { depart: string; arrivee: string }) 
     <div class="carte etat-vide">
       <p class="titre-etat">Aucune ligne trouvée entre {depart} et {arrivee}</p>
       <p class="sous-texte">
-        Le corridor documenté ne couvre pas encore ce trajet, ou il demande plus d’une
-        correspondance. D’autres axes arrivent bientôt.
+        Aucune chaîne de lignes du corridor documenté ne relie ces deux arrêts, même avec
+        plusieurs changements. D’autres axes arrivent bientôt.
       </p>
       <a href="/signalement" class="cta">Signaler une ligne manquante</a>
     </div>
@@ -210,10 +225,9 @@ export default function SearchResults({ lignes, config }: Props) {
         </div>
       )}
 
-      {resultat !== null &&
-        (resultat.statut === 'aucun_resultat' || resultat.statut === 'trop_de_correspondances') && (
-          <SansResultat depart={parametres.depart} arrivee={parametres.arrivee} />
-        )}
+      {resultat !== null && resultat.statut === 'aucun_resultat' && (
+        <SansResultat depart={parametres.depart} arrivee={parametres.arrivee} />
+      )}
 
       {resultat !== null && resultat.statut === 'resultats' && (
         <>
@@ -223,8 +237,12 @@ export default function SearchResults({ lignes, config }: Props) {
               : `${resultat.options.length} trajets trouvés`}
           </p>
           <ul class="liste-trajets">
-            {resultat.options.map((option) => (
-              <CarteTrajet key={option.lignes.map((l) => l.id).join('-')} option={option} />
+            {resultat.options.map((option, rang) => (
+              <CarteTrajet
+                key={option.lignes.map((l) => l.id).join('-')}
+                option={option}
+                deplie={rang === 0}
+              />
             ))}
           </ul>
         </>

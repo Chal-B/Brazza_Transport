@@ -1003,6 +1003,27 @@
     background: #fff;
   }
 
+  .trajet-repliable > summary {
+    cursor: pointer;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  .voir-itineraire {
+    flex: 0 0 auto;
+    color: var(--color-texte);
+    font-size: var(--text-petit);
+    font-weight: var(--font-weight-fort);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .trajet-repliable[open] > summary .voir-itineraire {
+    display: none;
+  }
+
   .liens-trajet {
     display: flex;
     flex-wrap: wrap;
