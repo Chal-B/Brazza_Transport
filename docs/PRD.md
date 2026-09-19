@@ -172,10 +172,11 @@ When l'utilisateur regarde les détails,
 Then un badge visuel vert « Vérifié il y a moins de 24h » s'affiche avec la date
      du dernier relevé terrain.
 ```
-> ⚠️ La date exacte de collecte terrain n'est pas présente dans le fichier
-> `Résultats_Recherche_Terrain.xlsx` fourni. À demander à l'équipe terrain avant
-> de renseigner `derniere_verification` dans `lignes.json` (voir section 7.1) —
-> ne pas inventer de date.
+> La date de collecte terrain, absente du fichier `Résultats_Recherche_Terrain.xlsx`
+> fourni, a été confirmée le 2026-09-19 : les 8 lignes ont été relevées le
+> **2026-09-13**. `derniere_verification` porte cette date dans `lignes.json`
+> (voir section 7.1). Le champ reste nullable dans le schéma pour une ligne
+> ajoutée avant sa vérification — une date ne s'invente jamais.
 
 ### US-02 : Moteur de recherche d'itinéraire par arrêt ou quartier
 
@@ -379,7 +380,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Avenue de France / Marché Poto-Poto aux heures de pointe"
       ],
       "correspondances_possibles": ["L02", "L03", "L04", "L07", "L08"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -412,7 +413,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Rond-Point La Coupole et Marché Total aux heures de pointe"
       ],
       "correspondances_possibles": ["L01", "L04", "L07"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -445,7 +446,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Intersection Mbochi / Avenue de la Paix aux heures de pointe"
       ],
       "correspondances_possibles": ["L01"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -480,7 +481,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Rond-point Ebina et Hôpital Talangaï aux heures de pointe"
       ],
       "correspondances_possibles": ["L01", "L02"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -512,7 +513,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Lycée Thoma et Marché Massengo aux heures de pointe"
       ],
       "correspondances_possibles": ["L06"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -543,7 +544,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Rond-point Mazala aux heures de pointe"
       ],
       "correspondances_possibles": ["L05", "L08"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -577,7 +578,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Jeanne Viale / Mampassi aux heures de pointe"
       ],
       "correspondances_possibles": ["L01", "L02", "L08"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     },
     {
@@ -608,19 +609,18 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
         "Bouchon récurrent : Marché Moukondo / Mazala aux heures de pointe"
       ],
       "correspondances_possibles": ["L01", "L06", "L07"],
-      "derniere_verification": null,
+      "derniere_verification": "2026-09-13",
       "statut_verification": "verifie"
     }
   ]
 }
 ```
 
-> **Note sur `derniere_verification: null`** : le fichier terrain fourni ne
-> contient pas de date de collecte. Ce champ est **obligatoire** dans le schéma
-> (voir 7.2) — il faut la demander à l'équipe terrain avant la mise en
-> production ; ne pas la remplacer par une date inventée. En attendant, l'app
-> doit gérer proprement un badge de fraîcheur « Date de vérification manquante »
-> plutôt que de planter ou d'afficher une fausse date.
+> **Note sur `derniere_verification`** : le fichier terrain fourni ne portait
+> pas de date de collecte. L'équipe terrain l'a confirmée le 2026-09-19 — relevé
+> du **2026-09-13** sur les 8 lignes — et l'extrait ci-dessus la reflète. Le
+> champ reste nullable : une ligne ajoutée avant sa vérification affiche le badge
+> hachuré « Date de vérification à confirmer » plutôt qu'une fausse date.
 
 > **Note sur `tarif_pointe.fcfa` unique (au lieu de `min_fcfa`/`max_fcfa`)** :
 > contrairement à l'hypothèse de la V1.0 du PRD, l'enquête terrain rapporte un
@@ -652,7 +652,7 @@ la V1.0 du schéma) — voir le dictionnaire des champs révisé en 7.2.
 | `tarification.crise_carburant` | objet `{fcfa}` | non | **Tarif unique observé** appliqué quand la config globale `isFuelCrisisActive = true`. |
 | `particularites` | array[string] | non | Infos utiles : bouchons connus, irrégularités constatées. **Les mentions nuit/pluie de la V1.0 étaient des hypothèses non vérifiées — retirées tant qu'une collecte ne les confirme pas.** |
 | `correspondances_possibles` | array[id] | non | IDs des lignes partageant un arrêt réel (calculé à partir des arrêts communs relevés sur le terrain, voir liste en 7.1) |
-| `derniere_verification` | date \| null | oui (valeur peut être `null` en attendant la donnée) | Date de la dernière vérification terrain. **Manquante dans le fichier source actuel — à ne jamais halluciner.** |
+| `derniere_verification` | date \| null | oui (`null` tant que la ligne n'a pas été vérifiée) | Date de la dernière vérification terrain. Les 8 lignes portent le relevé du 2026-09-13, confirmé le 2026-09-19. **À ne jamais halluciner sur une ligne ajoutée plus tard.** |
 | `statut_verification` | enum | oui | `verifie` \| `a_verifier` \| `signale_incorrect` |
 
 ### 7.3 Barème du badge de fraîcheur
@@ -821,7 +821,6 @@ Objectif : amener l'utilisateur à la recherche en moins de 5 secondes.
 ## 12. Pistes V2 (post-MVP)
 
 - Extension du corridor à Mfilou, Madibou, Djiri (Ouenzé, Moungali et Talangaï sont **déjà couverts** par les 8 lignes terrain, voir section 7.1).
-- Confirmation des dates de collecte manquantes (`derniere_verification`) pour les 8 lignes déjà enquêtées.
 - Carte visuelle simple des lignes (SVG statique, pas de GPS temps réel).
 - Notation/avis des usagers sur la fiabilité d'une ligne.
 - Alertes saisonnières (ex. : routes impraticables en saison des pluies).

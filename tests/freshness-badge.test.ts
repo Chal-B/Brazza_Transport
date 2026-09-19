@@ -115,11 +115,18 @@ describe('Application au jeu de donnees reel', () => {
     }
   });
 
-  it('les dates terrain etant absentes aujourd hui, les badges sont hachures (voir #9)', () => {
-    const lignesSansDate = getToutesLesLignes().filter((l) => l.derniere_verification === null);
+  it('chaque ligne porte une date de releve terrain lisible (#9)', () => {
+    for (const ligne of getToutesLesLignes()) {
+      expect(ligne.derniere_verification, ligne.id).not.toBeNull();
+      expect(Number.isNaN(new Date(ligne.derniere_verification as string).getTime())).toBe(false);
+    }
+  });
 
-    for (const ligne of lignesSansDate) {
-      expect(badgeFraicheurDeLigne(ligne, maintenant).classe).toBe('badge-inconnu');
+  it('au lendemain du releve du 2026-09-13, les 8 lignes sont vertes', () => {
+    const lendemain = new Date('2026-09-14T08:00:00Z');
+
+    for (const ligne of getToutesLesLignes()) {
+      expect(badgeFraicheurDeLigne(ligne, lendemain).classe, ligne.id).toBe('badge-frais');
     }
   });
 });
